@@ -9,37 +9,49 @@ const API_CONFIG = {
   TIMEOUT: 10000,
 };
 
-// Khởi tạo tài khoản mẫu ban đầu nếu localStorage chưa có dữ liệu
+// Khởi tạo tài khoản mẫu và bổ sung tài khoản còn thiếu vào localStorage
 function initMockDatabase() {
-  const users = localStorage.getItem("mock_users");
-  if (!users) {
-    const initialUsers = [
-      {
-        id: 1,
-        fullName: "Lạc Mạnh Tuấn",
-        email: "tuan.lac@example.edu.vn",
-        password: "Password@123",
-        role: "ThucTapSinh",
-        university: "ĐH Công nghệ Thông tin & Truyền thông - ĐHTN",
-        major: "Công nghệ Thông tin",
-        status: "ChoDuyet", // Trạng thái: 'ChuaNop', 'ChoDuyet', 'DaDuyet', 'TuChoi'
-        hasCv: true,
-        cvFileName: "CV_LacManhTuan.pdf",
-      },
-      {
-        id: 2,
-        fullName: "Cán Bộ Tuyển Dụng HR",
-        email: "hr@company.com",
-        password: "Password@123",
-        role: "HR",
-        university: "",
-        major: "",
-        status: "HoatDong",
-        hasCv: false,
-      },
-    ];
-    localStorage.setItem("mock_users", JSON.stringify(initialUsers));
+  const defaultUsers = [
+    {
+      id: 1,
+      fullName: "Lạc Mạnh Tuấn",
+      email: "tuan.lac@example.edu.vn",
+      password: "Password@123",
+      role: "ThucTapSinh",
+      university: "ĐH Công nghệ Thông tin & Truyền thông - ĐHTN",
+      major: "Công nghệ Thông tin",
+      status: "ChoDuyet", // Trạng thái: 'ChuaNop', 'ChoDuyet', 'DaDuyet', 'TuChoi'
+      hasCv: true,
+      cvFileName: "CV_LacManhTuan.pdf",
+    },
+    {
+      id: 2,
+      fullName: "Cán Bộ Tuyển Dụng HR",
+      email: "hr@company.com",
+      password: "Password@123",
+      role: "HR",
+      university: "",
+      major: "",
+      status: "HoatDong",
+      hasCv: false,
+    },
+  ];
+
+  let savedUsers = [];
+  try {
+    savedUsers = JSON.parse(localStorage.getItem("mock_users") || "[]");
+  } catch (error) {
+    savedUsers = [];
   }
+
+  const users = [...savedUsers];
+  defaultUsers.forEach((defaultUser) => {
+    if (!users.some((user) => user.email === defaultUser.email)) {
+      users.push(defaultUser);
+    }
+  });
+
+  localStorage.setItem("mock_users", JSON.stringify(users));
 }
 initMockDatabase();
 
@@ -170,6 +182,46 @@ async function mockRequest(endpoint, options) {
         rejectReason: current.rejectReason || "",
       },
     };
+  }
+
+  // 5. MOCK: HR xem danh sách hồ sơ thực tập sinh
+  if (endpoint === "/hr/candidates" && method === "GET") {
+    const candidates = users
+      .filter((user) => user.role === "ThucTapSinh" && user.hasCv)
+      .map((user) => ({
+        id: user.id,
+        profileCode: `HS-${user.id}`,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone || "Chưa cập nhật",
+        university: user.university || "Chưa cập nhật",
+        major: user.major || "Chưa cập nhật",
+        position: user.position || "Thực tập sinh",
+        cvUrl: user.cvUrl || "about:blank",
+        status: user.status || "ChoDuyet",
+      }));
+
+    return { success: true, data: candidates };
+  }
+
+  // 6. MOCK: HR duyệt hồ sơ
+  if (endpoint === "/hr/approve" && method === "POST") {
+    const updatedUsers = users.map((user) =>
+      user.id === body.candidateId ? { ...user, status: "DaDuyet" } : user,
+    );
+    localStorage.setItem("mock_users", JSON.stringify(updatedUsers));
+    return { success: true, message: "Đã phê duyệt hồ sơ." };
+  }
+
+  // 7. MOCK: HR từ chối hồ sơ
+  if (endpoint === "/hr/reject" && method === "POST") {
+    const updatedUsers = users.map((user) =>
+      user.id === body.candidateId
+        ? { ...user, status: "TuChoi", rejectReason: body.reason || "" }
+        : user,
+    );
+    localStorage.setItem("mock_users", JSON.stringify(updatedUsers));
+    return { success: true, message: "Đã từ chối hồ sơ." };
   }
 
   throw new Error(

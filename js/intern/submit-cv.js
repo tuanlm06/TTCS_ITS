@@ -1,3 +1,5 @@
+import { api } from "../core/api.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   // 1. ROUTE GUARD: Kiểm tra token trước
   const token = localStorage.getItem("access_token");

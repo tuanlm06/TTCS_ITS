@@ -1,4 +1,4 @@
-import { api } from "../api.js";
+import { api } from "../core/api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("formRegister");

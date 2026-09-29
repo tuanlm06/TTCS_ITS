@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cổng Quản Trị Nhân Sự (HR) - Quản Lý Thực Tập Sinh</title>
+    <!-- Nhúng CSS dùng chung và CSS riêng cho HR -->
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/auth/dashboard.css" />
+    <link rel="stylesheet" href="../../css/hr/hr-dashboard.css" />
+  </head>
+  <body>
+    <div class="dashboard-wrapper">
+      <!-- Sidebar HR -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <h2>HR Management</h2>
+          <span class="badge-role" style="background-color: #059669"
+            >Nhân sự (HR)</span
+          >
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="#" class="menu-item active">
+            <span class="icon">👥</span> Xét duyệt hồ sơ
+          </a>
+          <a href="#" class="menu-item">
+            <span class="icon">📅</span> Đợt thực tập
+          </a>
+          <a href="#" class="menu-item">
+            <span class="icon">👨‍🏫</span> Phân công Mentor
+          </a>
+          <a href="#" class="menu-item">
+            <span class="icon">📊</span> Báo cáo & Thống kê
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button id="btnLogout" class="btn-logout">
+            <span class="icon">🚪</span> Đăng xuất
+          </button>
+        </div>
+      </aside>
+
+      <!-- Khu vực làm việc chính -->
+      <main class="main-content">
+        <header class="topbar">
+          <div class="welcome-box">
+            <h1>Danh Sách Hồ Sơ Thực Tập Sinh</h1>
+            <p>
+              Tiếp nhận, thẩm định hồ sơ ứng tuyển và phê duyệt vào các đợt thực
+              tập
+            </p>
+          </div>
+
+          <div class="user-profile-widget">
+            <div class="user-avatar" style="background-color: #059669">HR</div>
+            <div class="user-meta">
+              <span class="user-name" id="hrFullName"
+                >Cán bộ Tuyển dụng HR</span
+              >
+              <span class="user-email" id="hrEmail">hr@company.com</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="content-body">
+          <!-- Thống kê nhanh -->
+          <section class="kpi-grid">
+            <div class="card kpi-card">
+              <div class="kpi-icon blue">📁</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Tổng hồ sơ tiếp nhận</span>
+                <strong id="kpiTotal" class="kpi-value">0</strong>
+              </div>
+            </div>
+
+            <div class="card kpi-card">
+              <div class="kpi-icon orange">⏳</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Hồ sơ chờ xét duyệt</span>
+                <strong id="kpiPending" class="kpi-value" style="color: #d97706"
+                  >0</strong
+                >
+              </div>
+            </div>
+
+            <div class="card kpi-card">
+              <div class="kpi-icon green">✅</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Đã duyệt trúng tuyển</span>
+                <strong
+                  id="kpiApproved"
+                  class="kpi-value"
+                  style="color: #16a34a"
+                  >0</strong
+                >
+              </div>
+            </div>
+          </section>
+
+          <!-- Tìm kiếm & Bộ lọc -->
+          <section class="card filter-card">
+            <div class="filter-group">
+              <input
+                type="text"
+                id="searchInput"
+                class="form-control"
+                placeholder="🔍 Tìm theo họ tên, email hoặc mã hồ sơ..."
+              />
+            </div>
+            <div class="filter-group select-group">
+              <select id="filterUniversity" class="form-control">
+                <option value="">-- Tất cả trường học --</option>
+                <option value="ĐH Công nghệ Thông tin & Truyền thông">
+                  ĐH CNTT & Truyền thông (ICTU)
+                </option>
+                <option value="ĐH Kỹ thuật Công nghiệp">
+                  ĐH Kỹ thuật Công nghiệp (TNUT)
+                </option>
+              </select>
+            </div>
+            <div class="filter-group select-group">
+              <select id="filterStatus" class="form-control">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="ChoDuyet" selected>Chờ duyệt</option>
+                <option value="DaDuyet">Đã duyệt</option>
+                <option value="TuChoi">Từ chối</option>
+              </select>
+            </div>
+            <button
+              id="btnResetFilter"
+              class="btn-secondary-sm"
+              style="height: 42px"
+            >
+              Đặt lại
+            </button>
+          </section>
+
+          <!-- Bảng danh sách ứng viên -->
+          <section class="card table-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã hồ sơ</th>
+                  <th>Ứng viên</th>
+                  <th>Trường / Ngành</th>
+                  <th>Vị trí ứng tuyển</th>
+                  <th>Tài liệu CV</th>
+                  <th>Trạng thái</th>
+                  <th style="text-align: center">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="candidateTableBody">
+                <tr>
+                  <td colspan="7" class="empty-state">
+                    Đang nạp danh sách hồ sơ...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal xem CV trực tiếp -->
+    <div id="cvModal" class="modal-backdrop hidden">
+      <div class="modal-box modal-lg">
+        <div class="modal-header">
+          <h3 id="modalCvTitle">Chi tiết CV ứng viên</h3>
+          <button id="btnCloseCvModal" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body" style="height: 500px; padding: 0">
+          <iframe
+            id="cvIframe"
+            src=""
+            width="100%"
+            height="100%"
+            frameborder="0"
+          ></iframe>
+        </div>
+        <div class="modal-footer">
+          <button id="btnCloseCvModalFooter" class="btn-primary-sm">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Từ chối hồ sơ -->
+    <div id="rejectModal" class="modal-backdrop hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Lý do từ chối hồ sơ</h3>
+          <button id="btnCloseRejectModal" class="modal-close-btn">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Vui lòng ghi rõ lý do để hệ thống thông báo cho ứng viên:</p>
+          <textarea
+            id="rejectReasonInput"
+            class="form-control"
+            rows="4"
+            placeholder="Ví dụ: Chưa đạt yêu cầu kỹ năng đầu vào / Thiếu chứng chỉ..."
+          ></textarea>
+          <span class="error-msg" id="rejectReasonError"></span>
+        </div>
+        <div class="modal-footer">
+          <button id="btnCancelReject" class="btn-secondary-sm">Hủy bỏ</button>
+          <button id="btnConfirmReject" class="btn-danger-sm">
+            Xác nhận Từ chối
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nhúng đúng đường dẫn tới js/hr/hr-dashboard.js -->
+    <script type="module" src="../../js/hr/hr-dashboard.js"></script>
+  </body>
+</html>

@@ -1,11 +1,27 @@
-import { api } from "../api.js";
+import { api } from "../core/api.js";
 
 // Route Guard: Kiểm tra phiên đăng nhập ngay khi DOM được nạp
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("access_token");
   if (token) {
-    window.location.replace("../intern/intern-dashboard.html");
-    return;
+    const userProfileStr = localStorage.getItem("user_info");
+    let currentUser = {};
+
+    try {
+      currentUser = JSON.parse(userProfileStr) || {};
+    } catch (e) {
+      currentUser = {};
+    }
+
+    if (!currentUser.role) {
+      localStorage.removeItem("access_token");
+    } else if (currentUser.role === "HR" || currentUser.role === "Admin") {
+      window.location.replace("../hr/hr-dashboard.html");
+      return;
+    } else {
+      window.location.replace("../intern/intern-dashboard.html");
+      return;
+    }
   }
 
   const form = document.getElementById("formLogin");
@@ -98,7 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
       globalAlert.className = "alert alert-success";
       globalAlert.textContent = "Đăng nhập thành công! Đang chuyển hướng...";
 
+      const role = userInfo.role || "ThucTapSinh";
+
       setTimeout(() => {
+        if (role === "HR" || role === "Admin") {
+          window.location.href = "../hr/hr-dashboard.html";
+          return;
+        }
+
         const userStatus = userInfo.status || userInfo.trangThai || "ChuaNop";
         if (userStatus === "ChuaNop" || !userInfo.hasCv) {
           window.location.href = "../intern/submit-cv.html";
