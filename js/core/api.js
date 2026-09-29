@@ -1,42 +1,41 @@
 /**
- * js/core/api.js - File helper giao tiếp API tập trung (Hỗ trợ Mock đa luồng & Fetch thật)
+ * Central API helper for mock development and future backend integration.
  */
 
 const API_CONFIG = {
   BASE_URL: "http://localhost:5000/api/v1",
-  MOCK: true, // Đổi thành false khi kết nối với Backend thật
-  MOCK_DELAY: 400, // Giả lập độ trễ mạng 400ms để kiểm thử spinner loading
+  MOCK: true,
+  MOCK_DELAY: 400,
   TIMEOUT: 10000,
 };
 
-// Khởi tạo tài khoản mẫu và bổ sung tài khoản còn thiếu vào localStorage
-function initMockDatabase() {
-  const defaultUsers = [
-    {
-      id: 1,
-      fullName: "Lạc Mạnh Tuấn",
-      email: "tuan.lac@example.edu.vn",
-      password: "Password@123",
-      role: "ThucTapSinh",
-      university: "ĐH Công nghệ Thông tin & Truyền thông - ĐHTN",
-      major: "Công nghệ Thông tin",
-      status: "ChoDuyet", // Trạng thái: 'ChuaNop', 'ChoDuyet', 'DaDuyet', 'TuChoi'
-      hasCv: true,
-      cvFileName: "CV_LacManhTuan.pdf",
-    },
-    {
-      id: 2,
-      fullName: "Cán Bộ Tuyển Dụng HR",
-      email: "hr@company.com",
-      password: "Password@123",
-      role: "HR",
-      university: "",
-      major: "",
-      status: "HoatDong",
-      hasCv: false,
-    },
-  ];
+const DEFAULT_USERS = [
+  {
+    id: 1,
+    fullName: "Lạc Mạnh Tuấn",
+    email: "tuan.lac@example.edu.vn",
+    password: "Password@123",
+    role: "ThucTapSinh",
+    university: "ĐH Công nghệ Thông tin & Truyền thông - ĐHTN",
+    major: "Công nghệ Thông tin",
+    status: "ChoDuyet",
+    hasCv: true,
+    cvFileName: "CV_LacManhTuan.pdf",
+  },
+  {
+    id: 2,
+    fullName: "Cán Bộ Tuyển Dụng HR",
+    email: "hr@company.com",
+    password: "Password@123",
+    role: "HR",
+    university: "",
+    major: "",
+    status: "HoatDong",
+    hasCv: false,
+  },
+];
 
+function getMockUsers() {
   let savedUsers = [];
   try {
     savedUsers = JSON.parse(localStorage.getItem("mock_users") || "[]");
@@ -45,43 +44,36 @@ function initMockDatabase() {
   }
 
   const users = [...savedUsers];
-  defaultUsers.forEach((defaultUser) => {
+  DEFAULT_USERS.forEach((defaultUser) => {
     if (!users.some((user) => user.email === defaultUser.email)) {
       users.push(defaultUser);
     }
   });
-
   localStorage.setItem("mock_users", JSON.stringify(users));
+  return users;
 }
-initMockDatabase();
 
-/**
- * Xử lý dữ liệu giả lập cho toàn bộ các màn hình
- */
+getMockUsers();
+
 async function mockRequest(endpoint, options) {
-  // Giả lập độ trễ mạng bất đồng bộ
   await new Promise((resolve) => setTimeout(resolve, API_CONFIG.MOCK_DELAY));
 
   const method = (options.method || "GET").toUpperCase();
-  const users = JSON.parse(localStorage.getItem("mock_users") || "[]");
-
-  // Đọc body an toàn (Hỗ trợ cả JSON và FormData)
+  const users = getMockUsers();
   let body = {};
-  if (options.body) {
-    if (options.body instanceof FormData) {
-      body = Object.fromEntries(options.body.entries());
-    } else if (typeof options.body === "string") {
-      try {
-        body = JSON.parse(options.body);
-      } catch (e) {
-        body = {};
-      }
+
+  if (options.body instanceof FormData) {
+    body = Object.fromEntries(options.body.entries());
+  } else if (typeof options.body === "string") {
+    try {
+      body = JSON.parse(options.body);
+    } catch (error) {
+      body = {};
     }
   }
 
-  // 1. MOCK: Đăng ký tài khoản
   if (endpoint === "/auth/register" && method === "POST") {
-    if (users.some((u) => u.email === body.email)) {
+    if (users.some((user) => user.email === body.email)) {
       const error = new Error("Email này đã được sử dụng trên hệ thống");
       error.status = 409;
       error.data = {
@@ -98,10 +90,9 @@ async function mockRequest(endpoint, options) {
       role: "ThucTapSinh",
       university: body.university,
       major: body.major,
-      status: "ChuaNop", // Vừa đăng ký xong thì chưa nộp CV
+      status: "ChuaNop",
       hasCv: false,
     };
-
     localStorage.setItem("mock_users", JSON.stringify([...users, newUser]));
     return {
       success: true,
@@ -110,12 +101,10 @@ async function mockRequest(endpoint, options) {
     };
   }
 
-  // 2. MOCK: Đăng nhập
   if (endpoint === "/auth/login" && method === "POST") {
     const user = users.find(
       (item) => item.email === body.email && item.password === body.password,
     );
-
     if (!user) {
       const error = new Error("Email hoặc mật khẩu không chính xác");
       error.status = 401;
@@ -133,43 +122,33 @@ async function mockRequest(endpoint, options) {
     };
   }
 
-  // 3. MOCK: Thực tập sinh nộp hồ sơ & CV
   if (endpoint === "/intern/submit-cv" && method === "POST") {
     const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
-    const updatedUsers = users.map((u) => {
-      if (u.email === currentUser.email) {
-        return {
-          ...u,
-          university: body.university || u.university,
-          major: body.major || u.major,
-          position: body.desiredPosition || "Thực tập sinh",
-          hasCv: true,
-          status: "ChoDuyet",
-          cvFileName: body.cvFile ? body.cvFile.name : "CV_DinhKem.pdf",
-        };
-      }
-      return u;
-    });
-
+    const updatedUsers = users.map((user) =>
+      user.email === currentUser.email
+        ? {
+            ...user,
+            university: body.university || user.university,
+            major: body.major || user.major,
+            position: body.desiredPosition || "Thực tập sinh",
+            hasCv: true,
+            status: "ChoDuyet",
+            cvFileName: body.cvFile?.name || "CV_DinhKem.pdf",
+          }
+        : user,
+    );
     localStorage.setItem("mock_users", JSON.stringify(updatedUsers));
-
-    // Cập nhật lại user_info trong session
-    currentUser.hasCv = true;
-    currentUser.status = "ChoDuyet";
-    localStorage.setItem("user_info", JSON.stringify(currentUser));
-
-    return {
-      success: true,
-      message: "Nộp hồ sơ thành công! Hồ sơ đang chờ HR xét duyệt.",
-    };
+    localStorage.setItem(
+      "user_info",
+      JSON.stringify({ ...currentUser, hasCv: true, status: "ChoDuyet" }),
+    );
+    return { success: true, message: "Nộp hồ sơ thành công!" };
   }
 
-  // 4. MOCK: Lấy trạng thái hồ sơ của cá nhân Thực tập sinh
   if (endpoint === "/intern/profile-status" && method === "GET") {
     const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
     const current =
-      users.find((u) => u.email === currentUser.email) || currentUser;
-
+      users.find((user) => user.email === currentUser.email) || currentUser;
     return {
       success: true,
       data: {
@@ -184,39 +163,39 @@ async function mockRequest(endpoint, options) {
     };
   }
 
-  // 5. MOCK: HR xem danh sách hồ sơ thực tập sinh
   if (endpoint === "/hr/candidates" && method === "GET") {
-    const candidates = users
-      .filter((user) => user.role === "ThucTapSinh" && user.hasCv)
-      .map((user) => ({
-        id: user.id,
-        profileCode: `HS-${user.id}`,
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone || "Chưa cập nhật",
-        university: user.university || "Chưa cập nhật",
-        major: user.major || "Chưa cập nhật",
-        position: user.position || "Thực tập sinh",
-        cvUrl: user.cvUrl || "about:blank",
-        status: user.status || "ChoDuyet",
-      }));
-
-    return { success: true, data: candidates };
+    return {
+      success: true,
+      data: users
+        .filter((user) => user.role === "ThucTapSinh" && user.hasCv)
+        .map((user) => ({
+          id: user.id,
+          profileCode: `HS-${user.id}`,
+          fullName: user.fullName,
+          email: user.email,
+          phone: user.phone || "Chưa cập nhật",
+          university: user.university || "Chưa cập nhật",
+          major: user.major || "Chưa cập nhật",
+          position: user.position || "Thực tập sinh",
+          cvUrl: user.cvUrl || "about:blank",
+          status: user.status || "ChoDuyet",
+        })),
+    };
   }
 
-  // 6. MOCK: HR duyệt hồ sơ
   if (endpoint === "/hr/approve" && method === "POST") {
     const updatedUsers = users.map((user) =>
-      user.id === body.candidateId ? { ...user, status: "DaDuyet" } : user,
+      user.id === Number(body.candidateId)
+        ? { ...user, status: "DaDuyet" }
+        : user,
     );
     localStorage.setItem("mock_users", JSON.stringify(updatedUsers));
     return { success: true, message: "Đã phê duyệt hồ sơ." };
   }
 
-  // 7. MOCK: HR từ chối hồ sơ
   if (endpoint === "/hr/reject" && method === "POST") {
     const updatedUsers = users.map((user) =>
-      user.id === body.candidateId
+      user.id === Number(body.candidateId)
         ? { ...user, status: "TuChoi", rejectReason: body.reason || "" }
         : user,
     );
@@ -224,102 +203,81 @@ async function mockRequest(endpoint, options) {
     return { success: true, message: "Đã từ chối hồ sơ." };
   }
 
+  if (endpoint.startsWith("/hr/interns/") && method === "PUT") {
+    const id = Number(endpoint.split("/").pop());
+    const updatedUsers = users.map((user) =>
+      user.id === id
+        ? {
+            ...user,
+            fullName: body.fullName || user.fullName,
+            phone: body.phone || "",
+            university: body.university || user.university,
+            major: body.major || user.major,
+            position: body.position || user.position,
+          }
+        : user,
+    );
+    localStorage.setItem("mock_users", JSON.stringify(updatedUsers));
+    return { success: true, message: "Cập nhật hồ sơ thành công." };
+  }
+
   throw new Error(
     `[Mock Error] Endpoint "${endpoint}" với method "${method}" chưa được cấu hình.`,
   );
 }
 
-/**
- * Hàm gửi HTTP Request chính
- */
 async function request(endpoint, options = {}) {
-  // Nếu bật chế độ Mock -> Chuyển sang mockRequest
-  if (API_CONFIG.MOCK) {
-    return mockRequest(endpoint, options);
-  }
+  if (API_CONFIG.MOCK) return mockRequest(endpoint, options);
 
-  const url = `${API_CONFIG.BASE_URL}${endpoint}`;
-  const token = localStorage.getItem("access_token");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+  const headers = { Accept: "application/json", ...options.headers };
 
-  // Thiết lập Header tự động
-  const headers = {
-    Accept: "application/json",
-    ...options.headers,
-  };
-
-  // Nếu body KHÔNG PHẢI là FormData thì mới gán Content-Type là JSON
   if (!(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  // Hỗ trợ AbortController xử lý Timeout
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
-
-  const config = {
-    ...options,
-    headers,
-    signal: controller.signal,
-  };
+  const token = localStorage.getItem("access_token");
+  if (token) headers.Authorization = `Bearer ${token}`;
 
   try {
-    const response = await fetch(url, config);
+    const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
     clearTimeout(timeoutId);
-
     const data = await response.json().catch(() => null);
-
     if (!response.ok) {
-      const error = new Error(
-        (data && data.message) || "Có lỗi xảy ra trên hệ thống",
-      );
+      const error = new Error(data?.message || "Có lỗi xảy ra trên hệ thống");
       error.status = response.status;
       error.data = data;
       throw error;
     }
-
     return data;
   } catch (error) {
     clearTimeout(timeoutId);
-
     if (error.name === "AbortError") {
-      error.message =
-        "Yêu cầu đã bị hủy do máy chủ phản hồi quá thời gian quy định (Timeout).";
-    } else if (!error.status) {
-      error.message =
-        "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng hoặc máy chủ Backend!";
+      error.message = "Máy chủ phản hồi quá thời gian quy định.";
     }
     throw error;
   }
 }
 
-// Xuất các phương thức API tiện ích
 export const api = {
   get: (endpoint, options = {}) =>
     request(endpoint, { ...options, method: "GET" }),
-
-  post: (endpoint, body, options = {}) => {
-    // Nếu body là FormData (khi upload file), giữ nguyên không stringify
-    const isFormData = body instanceof FormData;
-    return request(endpoint, {
+  post: (endpoint, body, options = {}) =>
+    request(endpoint, {
       ...options,
       method: "POST",
-      body: isFormData ? body : JSON.stringify(body),
-    });
-  },
-
-  put: (endpoint, body, options = {}) => {
-    const isFormData = body instanceof FormData;
-    return request(endpoint, {
+      body: body instanceof FormData ? body : JSON.stringify(body),
+    }),
+  put: (endpoint, body, options = {}) =>
+    request(endpoint, {
       ...options,
       method: "PUT",
-      body: isFormData ? body : JSON.stringify(body),
-    });
-  },
-
+      body: body instanceof FormData ? body : JSON.stringify(body),
+    }),
   delete: (endpoint, options = {}) =>
     request(endpoint, { ...options, method: "DELETE" }),
 };
