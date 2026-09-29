@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trạng Thái Hồ Sơ & Hợp Đồng - Internship System</title>
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/auth/dashboard.css" />
+    <style>
+      .status-card {
+        max-width: 680px;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 32px;
+      }
+      .header-box {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      .status-icon-wrapper {
+        font-size: 50px;
+        margin-bottom: 12px;
+      }
+      .status-title {
+        font-size: 1.4rem;
+        color: #1e293b;
+        margin-bottom: 6px;
+      }
+      .status-desc {
+        font-size: 0.92rem;
+        color: #64748b;
+        line-height: 1.5;
+      }
+
+      .info-summary {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+      }
+      .info-item:last-child {
+        margin-bottom: 0;
+      }
+      .info-label {
+        color: #64748b;
+      }
+      .info-val {
+        font-weight: 600;
+        color: #0f172a;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+      .status-badge.pending {
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .status-badge.approved {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .status-badge.rejected {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .next-step-card {
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 0.88rem;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .contract-box {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+      .contract-title {
+        font-size: 1.1rem;
+        color: #166534;
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+      .checkbox-agree {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin: 16px 0;
+        font-size: 0.88rem;
+        color: #334155;
+      }
+
+      .btn-submit-contract {
+        background: #059669;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 18px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        font-size: 0.95rem;
+      }
+      .btn-submit-contract:hover {
+        background: #047857;
+      }
+      .btn-submit-contract:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+      }
+
+      .btn-actions-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+        gap: 12px;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body style="background-color: #f1f5f9">
+    <div class="status-card">
+      <div class="header-box">
+        <div id="statusIcon" class="status-icon-wrapper">⏳</div>
+        <h2 id="statusTitle" class="status-title">Hồ Sơ Đang Chờ Xét Duyệt</h2>
+        <p id="statusDesc" class="status-desc">
+          Hệ thống đang đồng bộ dữ liệu hồ sơ ứng tuyển của bạn...
+        </p>
+      </div>
+
+      <!-- Tóm tắt hồ sơ -->
+      <div class="info-summary">
+        <div class="info-item">
+          <span class="info-label">Mã hồ sơ:</span>
+          <span class="info-val" id="profileId">#HS-...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Họ và tên ứng viên:</span>
+          <span class="info-val" id="candidateName">...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Học vấn / Chuyên ngành:</span>
+          <span class="info-val" id="candidateEducation">...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Tài liệu CV đính kèm:</span>
+          <span class="info-val" id="cvFileName">...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Trạng thái thẩm định:</span>
+          <span id="statusBadge" class="status-badge pending">Chờ duyệt</span>
+        </div>
+      </div>
+
+      <!-- Hướng dẫn bước tiếp theo -->
+      <div id="nextStepBox" class="next-step-card">
+        ⏳ <strong>Bước tiếp theo:</strong> Hồ sơ của bạn đã được gửi tới Cán bộ
+        Tuyển dụng. Kết quả xét tuyển sẽ được cập nhật trực tiếp tại giao diện
+        này.
+      </div>
+
+      <!-- Khối Ký Hợp Đồng Điện Tử (US 10) -->
+      <div id="contractSection" class="contract-box hidden">
+        <div class="contract-title">📄 Thỏa Thuận & Hợp Đồng Thực Tập</div>
+        <div class="info-item">
+          <span class="info-label">Mã hợp đồng:</span>
+          <span class="info-val" id="contractCode">#HD-...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Thời hạn thực tập:</span>
+          <span class="info-val" id="contractDuration">...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Mức hỗ trợ phụ cấp:</span>
+          <span class="info-val" id="contractAllowance" style="color: #059669"
+            >...</span
+          >
+        </div>
+        <div style="margin-top: 10px">
+          <a
+            id="btnViewContractPdf"
+            href="#"
+            target="_blank"
+            style="
+              color: #0284c7;
+              font-size: 0.88rem;
+              font-weight: 600;
+              text-decoration: underline;
+            "
+          >
+            🔍 Xem chi tiết văn bản hợp đồng mẫu (.PDF)
+          </a>
+        </div>
+
+        <div id="signingFormBox" style="margin-top: 14px">
+          <label class="checkbox-agree">
+            <input
+              type="checkbox"
+              id="chkAgreeContract"
+              style="margin-top: 3px"
+            />
+            <span
+              >Tôi đã đọc kỹ, hiểu rõ và đồng ý với tất cả điều khoản, quyền lợi
+              và nghĩa vụ nêu trong hợp đồng thực tập.</span
+            >
+          </label>
+          <div
+            id="contractError"
+            style="color: #dc2626; font-size: 0.82rem; margin-bottom: 10px"
+          ></div>
+          <button id="btnSignContract" class="btn-submit-contract">
+            ✍️ Xác nhận Ký Hợp Đồng Trực Tuyến
+          </button>
+        </div>
+
+        <div
+          id="signedSuccessBadge"
+          class="hidden"
+          style="
+            margin-top: 14px;
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            color: #15803d;
+            font-weight: 600;
+            font-size: 0.9rem;
+          "
+        >
+          ✅ Bạn đã hoàn tất ký hợp đồng điện tử thành công!
+        </div>
+      </div>
+
+      <!-- Nút điều hướng chân trang -->
+      <div class="btn-actions-footer">
+        <button
+          id="btnLogout"
+          class="btn-secondary-sm"
+          style="height: 40px; padding: 0 16px"
+        >
+          🚪 Đăng xuất
+        </button>
+        <div style="display: flex; gap: 8px">
+          <button
+            id="btnReUpload"
+            class="btn-secondary-sm hidden"
+            style="height: 40px; padding: 0 16px"
+          >
+            🔄 Nộp lại CV
+          </button>
+          <button
+            id="btnEnterDashboard"
+            class="btn-primary-sm hidden"
+            style="height: 40px; padding: 0 18px; background: #059669"
+          >
+            🚀 Vào Trang Làm Việc
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="../../js/intern/pending-approval.js"></script>
+  </body>
+</html>

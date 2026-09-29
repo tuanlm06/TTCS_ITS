@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cổng Thực Tập Sinh - Bảng Điều Khiển</title>
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/auth/dashboard.css" />
+  </head>
+  <body>
+    <!-- Layout chính: Sidebar + Khu vực nội dung -->
+    <div class="dashboard-wrapper">
+      <!-- Sidebar bên trái -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <h2>TTCS Portal</h2>
+          <span class="badge-role">Thực tập sinh</span>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="#" class="menu-item active">
+            <span class="icon">📊</span> Tổng quan
+          </a>
+          <a href="#" class="menu-item">
+            <span class="icon">📋</span> Nhiệm vụ của tôi
+          </a>
+          <a href="#" class="menu-item">
+            <span class="icon">⏰</span> Chấm công & Phép
+          </a>
+          <a href="#" class="menu-item">
+            <span class="icon">📝</span> Báo cáo tuần
+          </a>
+          <a href="#" class="menu-item">
+            <span class="icon">💼</span> Phụ cấp & Hợp đồng
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button id="btnLogout" class="btn-logout">
+            <span class="icon">🚪</span> Đăng xuất
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content bên phải -->
+      <main class="main-content">
+        <!-- Topbar Header -->
+        <header class="topbar">
+          <div class="welcome-box">
+            <h1 id="welcomeUser">Xin chào, Thực tập sinh!</h1>
+            <p id="currentDateText">Hôm nay là ...</p>
+          </div>
+
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="userAvatar">TTS</div>
+            <div class="user-meta">
+              <span class="user-name" id="userNameHeader">Đang tải...</span>
+              <span class="user-email" id="userEmailHeader">...</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Nội dung bảng điều khiển -->
+        <div class="content-body">
+          <!-- Hàng 1: Thẻ thông tin nhanh (Summary KPI Cards) -->
+          <section class="kpi-grid">
+            <!-- Card Đợt thực tập -->
+            <div class="card kpi-card">
+              <div class="kpi-icon blue">🏢</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Chương trình / Phòng ban</span>
+                <strong id="kpiDepartment" class="kpi-value">Chưa xếp</strong>
+              </div>
+            </div>
+
+            <!-- Card Mentor phụ trách -->
+            <div class="card kpi-card">
+              <div class="kpi-icon green">👨‍🏫</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Mentor hướng dẫn</span>
+                <strong id="kpiMentor" class="kpi-value">Chưa phân công</strong>
+              </div>
+            </div>
+
+            <!-- Card Tiến độ nhiệm vụ -->
+            <div class="card kpi-card">
+              <div class="kpi-icon orange">📌</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Nhiệm vụ đang làm</span>
+                <strong id="kpiTaskCount" class="kpi-value">0 Task</strong>
+              </div>
+            </div>
+
+            <!-- Card Chấm công nhanh -->
+            <div class="card kpi-card checkin-widget">
+              <div class="checkin-info">
+                <span class="kpi-label">Điểm danh hôm nay</span>
+                <span id="checkinStatusText" class="badge-status pending"
+                  >Chưa check-in</span
+                >
+              </div>
+              <button id="btnCheckIn" class="btn-primary-sm">
+                Check-in ngay
+              </button>
+            </div>
+          </section>
+
+          <!-- Hàng 2: Grid 2 cột (Danh sách Task & Báo cáo / Thông báo) -->
+          <section class="dashboard-grid">
+            <!-- Cột 1: Danh sách công việc cần làm -->
+            <div class="card task-container">
+              <div class="card-header">
+                <h3>Nhiệm vụ gần đây</h3>
+                <a href="#" class="view-all-link">Xem tất cả</a>
+              </div>
+              <div class="card-body">
+                <div id="taskList" class="task-list">
+                  <!-- Javascript sẽ render danh sách task vào đây -->
+                  <div class="empty-state">Đang tải danh sách nhiệm vụ...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cột 2: Báo cáo tuần & Lịch trình -->
+            <div class="card report-container">
+              <div class="card-header">
+                <h3>Báo cáo thực tập tuần</h3>
+              </div>
+              <div class="card-body">
+                <div class="report-box">
+                  <p>Hạn nộp báo cáo tuần tiếp theo:</p>
+                  <div class="deadline-highlight">Thứ Sáu, 17:00</div>
+                  <button id="btnSubmitReport" class="btn-secondary-sm">
+                    Nộp báo cáo tuần
+                  </button>
+                </div>
+
+                <hr class="divider" />
+
+                <div class="contact-mentor-box">
+                  <h4>Kênh liên hệ Mentor</h4>
+                  <p id="mentorContactInfo">Email: Đang cập nhật</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="../../js/intern/intern-dashboard.js"></script>
+  </body>
+</html>
