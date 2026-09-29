@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trạng Thái Hồ Sơ Thực Tập Sinh</title>
+    <link rel="stylesheet" href="../../css/style.css" />
+    <style>
+      .status-container {
+        max-width: 580px;
+        text-align: center;
+      }
+
+      .status-icon-wrapper {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+      }
+
+      /* 3 trạng thái màu sắc */
+      .status-icon-wrapper.pending {
+        background-color: #fef3c7;
+        color: #d97706;
+      }
+      .status-icon-wrapper.approved {
+        background-color: #dcfce7;
+        color: #16a34a;
+      }
+      .status-icon-wrapper.rejected {
+        background-color: #fee2e2;
+        color: #dc2626;
+      }
+
+      /* Hộp tóm tắt hồ sơ đã nộp */
+      .summary-card {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 20px 0;
+        text-align: left;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px dashed #e2e8f0;
+        font-size: 0.9rem;
+      }
+
+      .summary-row:last-child {
+        border-bottom: none;
+      }
+
+      .summary-label {
+        color: #64748b;
+      }
+
+      .summary-value {
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+      .status-badge.pending {
+        background-color: #fef3c7;
+        color: #b45309;
+      }
+      .status-badge.approved {
+        background-color: #dcfce7;
+        color: #15803d;
+      }
+      .status-badge.rejected {
+        background-color: #fee2e2;
+        color: #b91c1c;
+      }
+
+      /* Hướng dẫn tiếp theo */
+      .next-step-box {
+        background-color: #eff6ff;
+        border-left: 4px solid #2563eb;
+        padding: 12px 16px;
+        text-align: left;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #1e40af;
+        margin-bottom: 24px;
+      }
+
+      .action-group {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+      }
+
+      .btn-secondary {
+        background-color: #f1f5f9;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+        padding: 10px 18px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: 0.2s;
+      }
+      .btn-secondary:hover {
+        background-color: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container status-container">
+      <!-- Icon trạng thái -->
+      <div id="statusIcon" class="status-icon-wrapper pending">⏳</div>
+
+      <!-- Tiêu đề & Thông báo chính -->
+      <div class="auth-header">
+        <h1 id="statusTitle">Hồ Sơ Đang Chờ Xét Duyệt</h1>
+        <p id="statusDesc">
+          Cảm ơn bạn đã ứng tuyển! Hồ sơ của bạn đã được chuyển đến bộ phận Nhân
+          sự (HR).
+        </p>
+      </div>
+
+      <!-- Khối tóm tắt thông tin đã nộp -->
+      <div class="summary-card">
+        <div class="summary-row">
+          <span class="summary-label">Mã hồ sơ:</span>
+          <span class="summary-value" id="profileId">#HS-0000</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Ứng viên:</span>
+          <span class="summary-value" id="candidateName">Đang tải...</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Trường / Chuyên ngành:</span>
+          <span class="summary-value" id="candidateEducation">...</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">File CV đính kèm:</span>
+          <span class="summary-value" id="cvFileName">CV_ThucTap.pdf</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Trạng thái hiện tại:</span>
+          <span class="status-badge pending" id="statusBadge">Chờ duyệt</span>
+        </div>
+      </div>
+
+      <!-- Hộp thông báo các bước tiếp theo -->
+      <div class="next-step-box" id="nextStepBox">
+        💡 <strong>Lưu ý:</strong> Quá trình xét duyệt hồ sơ thường mất từ 1 - 3
+        ngày làm việc. Kết quả và thông báo phân công Mentor sẽ được gửi trực
+        tiếp qua Email của bạn.
+      </div>
+
+      <!-- Nút hành động tương tác -->
+      <div class="action-group">
+        <!-- Nút xem/nộp lại CV (chỉ hiện khi chưa duyệt hoặc bị từ chối) -->
+        <a href="submit-cv.html" id="btnReUpload" class="btn-secondary">
+          ✏️ Cập nhật lại hồ sơ
+        </a>
+
+        <!-- Nút vào Dashboard (chỉ hiện và kích hoạt khi trạng thái = DaDuyet) -->
+        <button
+          id="btnEnterDashboard"
+          class="btn-submit hidden"
+          style="margin-top: 0; width: auto; padding: 10px 20px"
+        >
+          Vào Dashboard làm việc
+        </button>
+
+        <!-- Nút Đăng xuất -->
+        <button
+          type="button"
+          id="btnLogout"
+          class="btn-secondary"
+          style="color: #dc2626; border-color: #fca5a5"
+        >
+          Đăng xuất
+        </button>
+      </div>
+    </div>
+
+    <script
+      type="module"
+      src="../../js/core/intern/pending-approval.js"
+    ></script>
+  </body>
+</html>

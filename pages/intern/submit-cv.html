@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nộp Hồ Sơ & CV Thực Tập Sinh</title>
+    <link rel="stylesheet" href="../../css/style.css" />
+    <style>
+      /* Style riêng cho khu vực kéo thả Upload file */
+      .upload-box {
+        border: 2px dashed #cbd5e1;
+        border-radius: 8px;
+        padding: 30px 20px;
+        text-align: center;
+        background-color: #f8fafc;
+        cursor: pointer;
+        transition:
+          border-color 0.2s,
+          background-color 0.2s;
+        margin-top: 6px;
+      }
+      .upload-box:hover,
+      .upload-box.dragover {
+        border-color: #2563eb;
+        background-color: #eff6ff;
+      }
+      .upload-icon {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+        color: #64748b;
+      }
+      .file-info {
+        margin-top: 12px;
+        padding: 10px;
+        background-color: #e2e8f0;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+      }
+      .file-remove-btn {
+        color: #dc2626;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .auth-container-wide {
+        max-width: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container auth-container-wide">
+      <div class="auth-header">
+        <h1>Hoàn Thiện Hồ Sơ Ứng Tuyển</h1>
+        <p>Vui lòng cập nhật CV và thông tin để HR xét duyệt đợt thực tập</p>
+      </div>
+
+      <div id="globalAlert" class="alert hidden"></div>
+
+      <form id="formSubmitCv" novalidate>
+        <!-- Trường Đại học & Chuyên ngành -->
+        <div class="form-group">
+          <label for="university" class="form-label"
+            >Trường Đại học / Cao đẳng <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="university"
+            class="form-control"
+            placeholder="Ví dụ: Đại học CNTT & Truyền thông - ĐHTN"
+          />
+          <span class="error-msg" id="universityError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="major" class="form-label"
+            >Chuyên ngành đào tạo <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="major"
+            class="form-control"
+            placeholder="Ví dụ: Công nghệ phần mềm / Hệ thống thông tin"
+          />
+          <span class="error-msg" id="majorError"></span>
+        </div>
+
+        <!-- Vị trí mong muốn thực tập -->
+        <div class="form-group">
+          <label for="desiredPosition" class="form-label"
+            >Vị trí ứng tuyển thực tập <span class="required">*</span></label
+          >
+          <select id="desiredPosition" class="form-control">
+            <option value="">-- Chọn vị trí --</option>
+            <option value="Frontend">
+              Frontend Developer (HTML/CSS/JS/Vue/React)
+            </option>
+            <option value="Backend">
+              Backend Developer (.NET / Java / PHP / Python)
+            </option>
+            <option value="QA_QC">Tester / QA - QC</option>
+            <option value="DevOps">DevOps / Quản trị hệ thống</option>
+          </select>
+          <span class="error-msg" id="desiredPositionError"></span>
+        </div>
+
+        <!-- Khu vực Upload File CV -->
+        <div class="form-group">
+          <label class="form-label"
+            >Tải lên CV cá nhân (PDF/Word, < 5MB)
+            <span class="required">*</span></label
+          >
+          <input
+            type="file"
+            id="cvFileInput"
+            accept=".pdf,.doc,.docx"
+            class="hidden"
+          />
+
+          <div id="dropZone" class="upload-box">
+            <div class="upload-icon">📄</div>
+            <p><strong>Nhấn để chọn file</strong> hoặc kéo thả CV vào đây</p>
+            <small class="text-muted"
+              >Định dạng hỗ trợ: .pdf, .docx (Dung lượng tối đa 5MB)</small
+            >
+          </div>
+
+          <!-- Hiển thị tên file sau khi chọn -->
+          <div id="filePreview" class="file-info hidden">
+            <span id="fileName">tailieu.pdf</span>
+            <button type="button" id="btnRemoveFile" class="file-remove-btn">
+              ✕ Gỡ bỏ
+            </button>
+          </div>
+          <span class="error-msg" id="cvFileError"></span>
+        </div>
+
+        <!-- Đơn xin thực tập / Giới thiệu bản thân bổ sung -->
+        <div class="form-group">
+          <label for="coverLetter" class="form-label"
+            >Mục tiêu & Kỹ năng nổi bật (Đơn xin thực tập)</label
+          >
+          <textarea
+            id="coverLetter"
+            class="form-control"
+            rows="3"
+            placeholder="Tóm tắt ngắn gọn kỹ năng và mong muốn học hỏi của bạn..."
+          ></textarea>
+        </div>
+
+        <button type="submit" id="btnSubmit" class="btn-submit">
+          <span id="btnSpinner" class="spinner hidden"></span>
+          <span id="btnText">Nộp hồ sơ ngay</span>
+        </button>
+      </form>
+    </div>
+
+    <script type="module" src="../../js/core/intern/submit-cv.js"></script>
+  </body>
+</html>

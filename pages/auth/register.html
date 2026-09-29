@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký Tài khoản Thực tập sinh</title>
+    <link rel="stylesheet" href="../../css/style.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Đăng Ký Thực Tập Sinh</h1>
+        <p>Tạo tài khoản để tham gia chương trình thực tập</p>
+      </div>
+
+      <!-- Thông báo lỗi hoặc thành công từ hệ thống -->
+      <div id="globalAlert" class="alert hidden"></div>
+
+      <form id="formRegister" novalidate>
+        <!-- Họ và tên -->
+        <div class="form-group">
+          <label for="hoTen" class="form-label"
+            >Họ và tên <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="hoTen"
+            class="form-control"
+            placeholder="Ví dụ: Nguyễn Văn A"
+          />
+          <span class="error-msg" id="hoTenError"></span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-label"
+            >Địa chỉ Email <span class="required">*</span></label
+          >
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            placeholder="name@example.com"
+          />
+          <span class="error-msg" id="emailError"></span>
+        </div>
+
+        <!-- Mật khẩu -->
+        <div class="form-group">
+          <label for="matKhau" class="form-label"
+            >Mật khẩu <span class="required">*</span></label
+          >
+          <input
+            type="password"
+            id="matKhau"
+            class="form-control"
+            placeholder="Tối thiểu 8 ký tự"
+          />
+          <span class="error-msg" id="matKhauError"></span>
+        </div>
+
+        <!-- Nhập lại mật khẩu -->
+        <div class="form-group">
+          <label for="nhapLaiMatKhau" class="form-label"
+            >Nhập lại mật khẩu <span class="required">*</span></label
+          >
+          <input
+            type="password"
+            id="nhapLaiMatKhau"
+            class="form-control"
+            placeholder="Nhập lại mật khẩu trên"
+          />
+          <span class="error-msg" id="nhapLaiMatKhauError"></span>
+        </div>
+
+        <!-- Trường đại học -->
+        <div class="form-group">
+          <label for="truongHoc" class="form-label"
+            >Trường Đại học/Cao đẳng <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="truongHoc"
+            class="form-control"
+            placeholder="Ví dụ: Đại học CNTT & Truyền thông"
+          />
+          <span class="error-msg" id="truongHocError"></span>
+        </div>
+
+        <!-- Chuyên ngành (Không bắt buộc) -->
+        <div class="form-group">
+          <label for="chuyenNganh" class="form-label">Chuyên ngành</label>
+          <input
+            type="text"
+            id="chuyenNganh"
+            class="form-control"
+            placeholder="Ví dụ: Kỹ thuật phần mềm"
+          />
+          <span class="error-msg" id="chuyenNganhError"></span>
+        </div>
+
+        <!-- Nút Submit -->
+        <button type="submit" id="btnRegister" class="btn-submit">
+          <span id="btnSpinner" class="spinner hidden"></span>
+          <span id="btnText">Đăng ký</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a>
+      </div>
+    </div>
+
+    <!-- Nạp script logic dạng module để dùng api.js -->
+    <script type="module" src="../../js/core/auth/register.js"></script>
+  </body>
+</html>
