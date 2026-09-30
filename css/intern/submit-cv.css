@@ -1,0 +1,48 @@
+/* Style riêng cho khu vực kéo thả Upload file */
+.upload-box {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 30px 20px;
+  text-align: center;
+  background-color: #f8fafc;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+  margin-top: 6px;
+}
+
+.upload-box:hover,
+.upload-box.dragover {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  color: #64748b;
+}
+
+.file-info {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: #e2e8f0;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.file-remove-btn {
+  color: #dc2626;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.auth-container-wide {
+  max-width: 600px;
+}

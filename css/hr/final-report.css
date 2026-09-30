@@ -1,0 +1,154 @@
+/* Styling Trang Báo Cáo Tổng Kết HR */
+body {
+    background-color: #f8fafc;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    margin: 0;
+}
+
+.card-box-header {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-box-header h2 {
+    margin: 0 0 4px 0;
+    font-size: 1.3rem;
+    color: #1e293b;
+}
+
+.sub-text {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.export-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-export {
+    padding: 9px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-export.primary {
+    background: #059669;
+    color: #ffffff;
+}
+
+.btn-export.secondary {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.kpi-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.kpi-card-item {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-title {
+    display: block;
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.kpi-num {
+    font-size: 1.5rem;
+    color: #0f172a;
+}
+
+.text-blue {
+    color: #0284c7;
+}
+
+.text-green {
+    color: #16a34a;
+}
+
+.text-orange {
+    color: #ea580c;
+}
+
+.card-box {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 12px;
+}
+
+.badge-program {
+    background: #ecfdf5;
+    color: #047857;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.data-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* Hỗ trợ chế độ In ấn PDF */
+@media print {
+
+    .sidebar,
+    .topbar,
+    .export-actions {
+        display: none !important;
+    }
+
+    .dashboard-wrapper,
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+}

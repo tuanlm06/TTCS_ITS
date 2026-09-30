@@ -259,6 +259,7 @@
     opacity: 0;
     transform: translateY(12px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -281,4 +282,48 @@
   .modal-box.modal-lg {
     height: 90vh;
   }
+}
+
+/* CSS thuần hỗ trợ hiển thị Bảng Mentor */
+.user-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.user-subtext {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.text-subtle {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.intern-chip {
+  display: inline-block;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin: 2px;
+}
+
+.btn-action-primary {
+  background-color: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-action-primary:hover {
+  background-color: #0369a1;
 }

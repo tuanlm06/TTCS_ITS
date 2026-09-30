@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cổng Mentor - Quản Lý & Giao Nhiệm Vụ</title>
+    <!-- Nhúng CSS hệ thống và CSS Dashboard chung -->
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/auth/dashboard.css" />
+    <link rel="stylesheet" href="../../css/mentor/task-management.css" />
+</head>
+
+<body>
+    <!-- Layout chính: Sidebar + Khu vực nội dung -->
+    <div class="dashboard-wrapper">
+
+        <!-- 1. Sidebar bên trái dành cho Mentor -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>TTCS Portal</h2>
+                <span class="badge-role" style="background: #0284c7; color: #ffffff;">Mentor</span>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="task-management.html" class="menu-item active">
+                    <span class="icon">📋</span> Quản lý & Giao việc
+                </a>
+                <a href="final-evaluations.html" class="menu-item">
+                    <span class="icon">👥</span> Danh sách sinh viên & Đánh giá
+                </a>
+                <a href="report-reviews.html" class="menu-item">
+                    <span class="icon">📝</span> Đánh giá báo cáo
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="btnLogout" class="btn-logout">
+                    <span class="icon">🚪</span> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- 2. Main Content bên phải -->
+        <main class="main-content">
+
+            <!-- Topbar Header -->
+            <header class="topbar">
+                <div class="welcome-box">
+                    <h1 id="welcomeUser">Xin chào, Mentor!</h1>
+                    <p id="currentDateText">Hôm nay là ...</p>
+                </div>
+
+                <div class="user-profile-widget">
+                    <div class="user-avatar" id="userAvatar" style="background: #0284c7;">MT</div>
+                    <div class="user-meta">
+                        <span class="user-name" id="userNameHeader">Đang tải...</span>
+                        <span class="user-email" id="userEmailHeader">...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Nội dung chính Bảng điều khiển Mentor -->
+            <div class="content-body">
+
+                <!-- Khối Tiêu đề & Nút bấm Giao việc -->
+                <section class="card-box"
+                    style="margin-bottom: 20px; padding: 20px 24px; background: #ffffff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h2 style="margin: 0 0 4px 0; font-size: 1.3rem; color: #1e293b;">👨‍🏫 Bảng Quản Lý & Giao
+                                Nhiệm Vụ</h2>
+                            <p style="margin: 0; color: #64748b; font-size: 0.85rem;">Khởi tạo công việc, phân công và
+                                theo dõi tiến độ Thực tập sinh</p>
+                        </div>
+                        <button id="btnOpenCreateModal" class="btn-primary"
+                            style="background: #0284c7; color: #ffffff; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                            ➕ Giao nhiệm vụ mới
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Khối Bảng Danh sách Nhiệm vụ Đã Giao -->
+                <section class="card-box"
+                    style="background: #ffffff; border-radius: 10px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div class="card-header-flex"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px;">
+                        <h3 style="margin: 0; font-size: 1.1rem; color: #0f172a;">📋 Danh Sách Nhiệm Vụ Đã Phân Công
+                        </h3>
+                        <span id="totalTaskCount" class="badge-count"
+                            style="background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">0
+                            Task</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8fafc; text-align: left; border-bottom: 1px solid #e2e8f0;">
+                                    <th style="padding: 12px; font-size: 0.85rem; color: #475569;">Mã Task</th>
+                                    <th style="padding: 12px; font-size: 0.85rem; color: #475569;">Thực tập sinh</th>
+                                    <th style="padding: 12px; font-size: 0.85rem; color: #475569;">Tiêu đề nhiệm vụ</th>
+                                    <th style="padding: 12px; font-size: 0.85rem; color: #475569;">Hạn hoàn thành</th>
+                                    <th style="padding: 12px; font-size: 0.85rem; color: #475569;">Độ ưu tiên</th>
+                                    <th style="padding: 12px; font-size: 0.85rem; color: #475569;">Trạng thái</th>
+                                    <th style="padding: 12px; font-size: 0.85rem; color: #475569;">Tiến độ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mentorTaskTableBody">
+                                <tr>
+                                    <td colspan="7" style="padding: 24px; text-align: center; color: #64748b;">Đang tải
+                                        danh sách nhiệm vụ...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL POPUP GIAO NHIỆM VỤ MỚI -->
+    <div id="createTaskModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>➕ Giao Nhiệm Vụ Mới Cho Thực Tập Sinh</h3>
+                <button id="btnCloseModal" class="btn-close">&times;</button>
+            </div>
+
+            <form id="createTaskForm" class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Chọn Thực tập sinh tiếp nhận <span class="required">*</span></label>
+                    <select id="selectIntern" class="form-control" required>
+                        <option value="">-- Đang tải danh sách sinh viên --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tiêu đề công việc <span class="required">*</span></label>
+                    <input type="text" id="taskTitleInput" class="form-control"
+                        placeholder="Ví dụ: Nghiên cứu và Tích hợp API Báo cáo tuần" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mô tả chi tiết yêu cầu công việc</label>
+                    <textarea id="taskDescInput" rows="3" class="form-control"
+                        placeholder="Nhập chi tiết các đầu việc, link tài liệu hoặc kết quả cần đạt được..."></textarea>
+                </div>
+
+                <div class="form-row-grid">
+                    <div class="form-group">
+                        <label class="form-label">Hạn hoàn thành (Deadline) <span class="required">*</span></label>
+                        <input type="date" id="taskDeadlineInput" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Độ ưu tiên</label>
+                        <select id="taskPrioritySelect" class="form-control">
+                            <option value="low">🟢 Thấp (Low)</option>
+                            <option value="medium" selected>🟡 Trung bình (Medium)</option>
+                            <option value="high">🔴 Cao (High)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelModal" class="btn-secondary">Hủy bỏ</button>
+                    <button type="submit" id="btnSubmitTask" class="btn-primary">🚀 XÁC NHẬN GIAO VIỆC</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script điều khiển ES Modules -->
+    <script type="module" src="../../js/mentor/task-management.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,190 @@
+/* Styling Lịch Thực Tập Cá Nhân (CSS Thuần) */
+body {
+    background-color: #f8fafc;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    margin: 0;
+    padding: 0;
+}
+
+.dashboard-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 20px 24px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.header-title h2 {
+    margin: 0 0 4px 0;
+    font-size: 1.35rem;
+    color: #1e293b;
+}
+
+.sub-text {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.user-profile-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.btn-logout-sm {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.card-box {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.card-title {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 1.1rem;
+    color: #0f172a;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-item .label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.info-item .value {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.info-item .value.highlight {
+    color: #0284c7;
+}
+
+/* Timeline Layout CSS */
+.timeline-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    padding-left: 20px;
+    border-left: 3px solid #e2e8f0;
+}
+
+.timeline-item {
+    position: relative;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -29px;
+    top: 20px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #94a3b8;
+    border: 3px solid #ffffff;
+}
+
+.timeline-item.completed::before {
+    background: #16a34a;
+}
+
+.timeline-item.upcoming::before {
+    background: #0284c7;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.timeline-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.timeline-date {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #0284c7;
+    background: #e0f2fe;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.timeline-note {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.actions-footer {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.btn-back {
+    display: inline-block;
+    background-color: #0f172a;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.btn-back:hover {
+    background-color: #1e293b;
+}

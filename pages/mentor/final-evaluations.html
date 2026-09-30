@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cổng Mentor - Đánh Giá Tổng Kết Thực Tập</title>
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/auth/dashboard.css" />
+    <link rel="stylesheet" href="../../css/mentor/final-evaluations.css" />
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar bên trái dành cho Mentor -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>TTCS Portal</h2>
+                <span class="badge-role" style="background: #0284c7; color: #ffffff;">Mentor</span>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="task-management.html" class="menu-item">
+                    <span class="icon">📋</span> Quản lý & Giao việc
+                </a>
+                <a href="final-evaluations.html" class="menu-item active">
+                    <span class="icon">👥</span> Danh sách sinh viên & Đánh giá
+                </a>
+                <a href="report-reviews.html" class="menu-item">
+                    <span class="icon">📝</span> Đánh giá báo cáo
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="btnLogout" class="btn-logout">
+                    <span class="icon">🚪</span> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content bên phải -->
+        <main class="main-content">
+            <!-- Topbar Header -->
+            <header class="topbar">
+                <div class="welcome-box">
+                    <h1 id="welcomeUser">Xin chào, Mentor!</h1>
+                    <p id="currentDateText">Hôm nay là ...</p>
+                </div>
+
+                <div class="user-profile-widget">
+                    <div class="user-avatar" id="userAvatar" style="background: #0284c7;">MT</div>
+                    <div class="user-meta">
+                        <span class="user-name" id="userNameHeader">Đang tải...</span>
+                        <span class="user-email" id="userEmailHeader">...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Nội dung chính -->
+            <div class="content-body">
+                <section class="card-box-header">
+                    <div>
+                        <h2>⭐️ Đánh Giá Kỹ Năng & Thái Độ Tổng Kết</h2>
+                        <p class="sub-text">Chấm điểm tiêu chí chuyên môn, thái độ và nhận xét kết quả thực tập cuối kỳ
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Bảng Danh sách Sinh viên Cần Đánh giá -->
+                <section class="card-box">
+                    <div class="card-header-flex">
+                        <h3>👥 Danh Sách Thực Tập Sinh Phụ Trách</h3>
+                        <span id="totalInternCount" class="badge-count">0 Sinh viên</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã SV</th>
+                                    <th>Họ và Tên</th>
+                                    <th>Email</th>
+                                    <th>Đợt thực tập</th>
+                                    <th>Trạng thái</th>
+                                    <th>Điểm Tổng Kết</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mentorFinalTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center">Đang tải danh sách thực tập sinh...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL POPUP FORM ĐÁNH GIÁ TỔNG KẾT -->
+    <div id="evalModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalStudentName">⭐ Đánh Giá Tổng Kết Thực Tập</h3>
+                <button id="btnCloseModal" class="btn-close">&times;</button>
+            </div>
+
+            <form id="evalForm" class="modal-body">
+                <input type="hidden" id="modalInternId" />
+
+                <!-- Khối 1: Các tiêu chí chấm điểm -->
+                <div class="section-title">📊 1. Bảng Tiêu Chí Chấm Điểm (Thang điểm 10)</div>
+                <div class="scores-grid">
+                    <div class="form-group">
+                        <label class="form-label">Chuyên môn & Năng lực công việc (50%) <span
+                                class="required">*</span></label>
+                        <input type="number" id="techScoreInput" class="form-control" min="0" max="10" step="0.5"
+                            placeholder="0.0 - 10.0" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Thái độ & Ý thức kỷ luật (30%) <span class="required">*</span></label>
+                        <input type="number" id="attScoreInput" class="form-control" min="0" max="10" step="0.5"
+                            placeholder="0.0 - 10.0" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tự học & Tiếp thu góp ý (20%) <span class="required">*</span></label>
+                        <input type="number" id="learnScoreInput" class="form-control" min="0" max="10" step="0.5"
+                            placeholder="0.0 - 10.0" required />
+                    </div>
+                </div>
+
+                <!-- Khối 2: Nhận xét chi tiết -->
+                <div class="section-title">📝 2. Nhận Xét Chi Tiết & Định Hướng</div>
+                <div class="form-group">
+                    <label class="form-label">Điểm mạnh / Ưu điểm nổi bật</label>
+                    <textarea id="strengthsInput" rows="2" class="form-control"
+                        placeholder="Ghi nhận các điểm mạnh về kiến thức, kỹ năng, thái độ..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Điểm cần cải thiện / Hạn chế</label>
+                    <textarea id="improvementsInput" rows="2" class="form-control"
+                        placeholder="Góp ý các điểm sinh viên cần cẩn thận hoặc rèn luyện thêm..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nhận xét chung toàn bộ đợt thực tập <span
+                            class="required">*</span></label>
+                    <textarea id="overallCommentInput" rows="3" class="form-control"
+                        placeholder="Nhận xét tổng thể về kết quả thực tập..." required></textarea>
+                </div>
+
+                <!-- Khối 3: Đề xuất tuyển dụng -->
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="recommendHireCheck" />
+                        <span>🌟 <strong>Đề xuất tuyển dụng chính thức:</strong> Sinh viên có năng lực xuất sắc, đề xuất
+                            công ty nhận vào làm nhân viên chính thức sau khi tốt nghiệp.</span>
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelModal" class="btn-secondary">Hủy bỏ</button>
+                    <button type="submit" id="btnSubmitEval" class="btn-primary">🚀 GỬI ĐÁNH GIÁ FINAL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="../../js/mentor/final-evaluations.js"></script>
+</body>
+
+</html>

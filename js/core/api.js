@@ -26,16 +26,16 @@ const DEFAULT_USERS = [
     university: "ĐH Công nghệ Thông tin & Truyền thông - ĐHTN",
     major: "Công nghệ Thông tin",
     position: "Frontend Developer",
-    status: "ChoDuyet", // 'ChuaNop', 'ChoDuyet', 'DaDuyet', 'TuChoi'
+    status: "DaDuyet", // 'ChuaNop', 'ChoDuyet', 'DaDuyet', 'TuChoi'
     hasCv: true,
     cvFileName: "CV_LacManhTuan.pdf",
     cvUrl:
       "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     rejectReason: "",
-    contractStatus: "ChoKy", // 'ChoKy', 'DaKy'
+    contractStatus: "DaKy", // 'ChoKy', 'DaKy'
     contractSignedAt: null,
-    mentorId: null,
-    mentorName: "",
+    mentorId: 4,
+    mentorName: "ThS. Hoàng Anh Tuấn",
     programName: "Đợt thực tập Thu Đông 2026 (Khóa K23)",
   },
   {
@@ -256,16 +256,16 @@ async function mockRequest(endpoint, options) {
     const updatedUsers = users.map((user) =>
       user.email === currentUser.email
         ? {
-            ...user,
-            university: body.university || user.university,
-            major: body.major || user.major,
-            position: body.desiredPosition || "Thực tập sinh",
-            hasCv: true,
-            status: "ChoDuyet",
-            cvFileName: body.cvFile?.name || "CV_DinhKem.pdf",
-            cvUrl:
-              "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-          }
+          ...user,
+          university: body.university || user.university,
+          major: body.major || user.major,
+          position: body.desiredPosition || "Thực tập sinh",
+          hasCv: true,
+          status: "ChoDuyet",
+          cvFileName: body.cvFile?.name || "CV_DinhKem.pdf",
+          cvUrl:
+            "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        }
         : user,
     );
 
@@ -314,7 +314,7 @@ async function mockRequest(endpoint, options) {
     };
   }
 
-  // 4.1 MOCK: Tổng quan bảng điều khiển Thực tập sinh (KPI, Task, Mentor)
+  // 4.1 MOCK: Tổng quan bảng điều khiển Thực tập sinh
   if (endpoint === "/intern/overview" && method === "GET") {
     const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
     const current =
@@ -324,7 +324,6 @@ async function mockRequest(endpoint, options) {
         user.id === current.mentorId || user.fullName === current.mentorName,
     );
 
-    // Kiểm tra trạng thái check-in hôm nay
     const todayDate = new Date().toISOString().split("T")[0];
     const isCheckedIn =
       localStorage.getItem(`checkin_${current.id || "guest"}_${todayDate}`) === "true";
@@ -373,12 +372,14 @@ async function mockRequest(endpoint, options) {
     };
   }
 
-  // 5. MOCK: HR lấy danh sách hồ sơ thực tập sinh (US 5)
+  // 5. MOCK: HR lấy danh sách hồ sơ thực tập sinh
+  // 5. MOCK: HR lấy danh sách hồ sơ thực tập sinh (ĐÃ SỬA LỖI)
   if (endpoint === "/hr/candidates" && method === "GET") {
     return {
       success: true,
       data: users
-        .filter((user) => user.role === "ThucTapSinh" && user.hasCv)
+        // BỎ điều kiện && user.hasCv để hiển thị cả sinh viên mới được HR cấp tài khoản
+        .filter((user) => user.role === "ThucTapSinh" || user.role === "Intern")
         .map((user) => ({
           id: user.id,
           profileCode: `HS-${user.id}`,
@@ -388,21 +389,20 @@ async function mockRequest(endpoint, options) {
           university: user.university || "Chưa cập nhật",
           major: user.major || "Chưa cập nhật",
           position: user.position || "Thực tập sinh",
-          cvUrl:
-            user.cvUrl ||
-            "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-          cvFileName: user.cvFileName || "CV_ThucTap.pdf",
-          status: user.status || "ChoDuyet",
+          cvUrl: user.cvUrl || "",
+          cvFileName: user.cvFileName || (user.hasCv ? "CV_ThucTap.pdf" : "Chưa nộp CV"),
+          hasCv: Boolean(user.hasCv),
+          status: user.status || "ChuaNop",
           rejectReason: user.rejectReason || "",
           contractStatus: user.contractStatus || "ChoKy",
           mentorId: user.mentorId || null,
-          mentorName: user.mentorName || "",
+          mentorName: user.mentorName || "Chưa phân công",
           programName: user.programName || "",
         })),
     };
   }
 
-  // 6. MOCK: HR phê duyệt hồ sơ (US 7)
+  // 6. MOCK: HR phê duyệt hồ sơ
   if (endpoint === "/hr/approve" && method === "POST") {
     const targetId = Number(body.candidateId);
     const updatedUsers = users.map((user) =>
@@ -414,25 +414,24 @@ async function mockRequest(endpoint, options) {
     return { success: true, message: "Đã phê duyệt hồ sơ thành công." };
   }
 
-  // 7. MOCK: HR từ chối hồ sơ kèm lý do (US 7)
+  // 7. MOCK: HR từ chối hồ sơ
   if (endpoint === "/hr/reject" && method === "POST") {
     const targetId = Number(body.candidateId);
     const updatedUsers = users.map((user) =>
       user.id === targetId
         ? {
-            ...user,
-            status: "TuChoi",
-            rejectReason: body.reason || "Hồ sơ chưa đạt yêu cầu chuẩn.",
-          }
+          ...user,
+          status: "TuChoi",
+          rejectReason: body.reason || "Hồ sơ chưa đạt yêu cầu chuẩn.",
+        }
         : user,
     );
     localStorage.setItem("mock_users", JSON.stringify(updatedUsers));
     return { success: true, message: "Đã từ chối hồ sơ." };
   }
 
-  // 8. MOCK: HR tạo tài khoản hộ, sinh viên tự nộp CV sau (Trường hợp A)
+  // 8. MOCK: HR tạo tài khoản hộ
   if (endpoint === "/hr/interns" && method === "POST") {
-    // 1. Kiểm tra trùng lặp email
     if (users.some((u) => u.email.toLowerCase() === body.email.toLowerCase())) {
       const error = new Error("Email này đã được sử dụng trên hệ thống!");
       error.status = 409;
@@ -445,13 +444,13 @@ async function mockRequest(endpoint, options) {
       fullName: body.fullName,
       email: body.email,
       phone: body.phone || "Chưa cập nhật",
-      password: "Password@123", // Mật khẩu khởi tạo
+      password: "Password@123",
       role: "ThucTapSinh",
       university: body.university,
       major: body.major || "Chưa cập nhật",
       position: body.position || "Thực tập sinh",
-      status: "ChuaNop", // TRƯỜNG HỢP A: Trạng thái chưa nộp
-      hasCv: false, // TRƯỜNG HỢP A: Chưa có CV
+      status: "ChuaNop",
+      hasCv: false,
       cvFileName: "",
       cvUrl: "",
       rejectReason: "",
@@ -467,19 +466,18 @@ async function mockRequest(endpoint, options) {
 
     return {
       success: true,
-      message:
-        "Cấp tài khoản cho sinh viên thành công! Sinh viên cần đăng nhập để nộp CV online.",
+      message: "Cấp tài khoản cho sinh viên thành công!",
       data: newIntern,
     };
   }
 
-  // 9. MOCK: HR cập nhật thông tin hồ sơ thực tập sinh (US 2)
+  // 9. MOCK: HR cập nhật thông tin thực tập sinh
   if (endpoint.startsWith("/hr/interns/") && method === "PUT") {
     const id = Number(endpoint.split("/").pop());
     const existingIndex = users.findIndex((u) => u.id === id);
 
     if (existingIndex === -1) {
-      const error = new Error("Không tìm thấy thực tập sinh này trên hệ thống");
+      const error = new Error("Không tìm thấy thực tập sinh này.");
       error.status = 404;
       throw error;
     }
@@ -488,25 +486,12 @@ async function mockRequest(endpoint, options) {
       ...users[existingIndex],
       fullName: body.fullName || users[existingIndex].fullName,
       phone: body.phone !== undefined ? body.phone : users[existingIndex].phone,
-      university:
-        body.university !== undefined
-          ? body.university
-          : users[existingIndex].university,
+      university: body.university !== undefined ? body.university : users[existingIndex].university,
       major: body.major !== undefined ? body.major : users[existingIndex].major,
-      position:
-        body.position !== undefined
-          ? body.position
-          : users[existingIndex].position,
+      position: body.position !== undefined ? body.position : users[existingIndex].position,
     };
 
     localStorage.setItem("mock_users", JSON.stringify(users));
-
-    const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
-    if (currentUser.id === id) {
-      const { password, ...safeInfo } = users[existingIndex];
-      localStorage.setItem("user_info", JSON.stringify(safeInfo));
-    }
-
     return {
       success: true,
       message: "Cập nhật hồ sơ thành công.",
@@ -514,35 +499,31 @@ async function mockRequest(endpoint, options) {
     };
   }
 
-  // 10. MOCK: Thực tập sinh lấy chi tiết hợp đồng để ký (US 10)
+  // 10. MOCK: Thực tập sinh lấy chi tiết hợp đồng
   if (endpoint === "/intern/contract" && method === "GET") {
     const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
-    const current =
-      users.find((user) => user.email === currentUser.email) || currentUser;
+    const current = users.find((user) => user.email === currentUser.email) || currentUser;
 
     return {
       success: true,
       data: {
         contractCode: `HD-2026-${current.id || 101}`,
         internName: current.fullName,
-        university:
-          current.university || "ĐH Công nghệ Thông tin & Truyền thông - ĐHTN",
+        university: current.university || "ĐH Công nghệ Thông tin & Truyền thông - ĐHTN",
         position: current.position || "Thực tập sinh",
         startDate: "01/10/2026",
         endDate: "31/12/2026",
         allowance: "3.000.000 VNĐ / tháng",
         contractStatus: current.contractStatus || "ChoKy",
         contractSignedAt: current.contractSignedAt || null,
-        pdfUrl:
-          "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
       },
     };
   }
 
-  // 11. MOCK: Thực tập sinh xác nhận ký hợp đồng (US 10)
+  // 11. MOCK: Thực tập sinh xác nhận ký hợp đồng
   if (endpoint === "/intern/contract/confirm" && method === "POST") {
     const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
-    const current = users.find((user) => user.email === currentUser.email);
 
     if (!body.agreeTerms) {
       const error = new Error("Bạn phải đồng ý với điều khoản hợp đồng.");
@@ -550,29 +531,15 @@ async function mockRequest(endpoint, options) {
       throw error;
     }
 
-    if (!current || current.status !== "DaDuyet") {
-      const error = new Error(
-        "Hồ sơ chưa được HR duyệt nên chưa thể ký hợp đồng.",
-      );
-      error.status = 403;
-      throw error;
-    }
-
     const signedTime = new Date().toISOString();
-
     const updatedUsers = users.map((u) => {
       if (u.email === currentUser.email) {
-        return {
-          ...u,
-          contractStatus: "DaKy",
-          contractSignedAt: signedTime,
-        };
+        return { ...u, contractStatus: "DaKy", contractSignedAt: signedTime };
       }
       return u;
     });
 
     localStorage.setItem("mock_users", JSON.stringify(updatedUsers));
-
     currentUser.contractStatus = "DaKy";
     currentUser.contractSignedAt = signedTime;
     localStorage.setItem("user_info", JSON.stringify(currentUser));
@@ -580,21 +547,16 @@ async function mockRequest(endpoint, options) {
     return {
       success: true,
       message: "Ký xác nhận hợp đồng thực tập thành công!",
-      data: {
-        contractStatus: "DaKy",
-        signedAt: signedTime,
-      },
+      data: { contractStatus: "DaKy", signedAt: signedTime },
     };
   }
 
-  // 12. MOCK: HR lấy danh sách Mentor khả dụng (US 12)
+  // 12. MOCK: HR lấy danh sách Mentor
   if (endpoint.startsWith("/hr/mentors") && method === "GET") {
     const mentors = users
       .filter((u) => u.role === "Mentor")
       .map((mentor) => {
-        const currentCount = users.filter(
-          (u) => u.mentorId === mentor.id,
-        ).length;
+        const currentCount = users.filter((u) => u.mentorId === mentor.id).length;
         return {
           id: mentor.id,
           fullName: mentor.fullName,
@@ -609,7 +571,7 @@ async function mockRequest(endpoint, options) {
     return { success: true, data: mentors };
   }
 
-  // 13. MOCK: HR thực hiện phân công Mentor cho Thực tập sinh (US 12)
+  // 13. MOCK: HR phân công Mentor
   if (endpoint === "/hr/assignments" && method === "POST") {
     const { internId, mentorId, programName, note } = body;
     const targetInternId = Number(internId);
@@ -638,29 +600,19 @@ async function mockRequest(endpoint, options) {
     });
 
     localStorage.setItem("mock_users", JSON.stringify(updatedUsers));
-
-    const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
-    if (currentUser.id === targetInternId) {
-      currentUser.mentorId = targetMentorId;
-      currentUser.mentorName = mentor.fullName;
-      localStorage.setItem("user_info", JSON.stringify(currentUser));
-    }
-
     return {
       success: true,
       message: `Đã phân công Mentor ${mentor.fullName} hướng dẫn thành công!`,
     };
   }
 
-  // 14. MOCK: HR lấy danh sách các Đợt thực tập theo phòng ban (US 13)
+  // 14. MOCK: HR lấy danh sách đợt thực tập
   if (endpoint === "/hr/programs" && method === "GET") {
     const programs = getMockPrograms();
     const now = new Date();
 
     const data = programs.map((p) => {
-      const enrolledCount = users.filter(
-        (u) => u.programName === p.name,
-      ).length;
+      const enrolledCount = users.filter((u) => u.programName === p.name).length;
       const start = new Date(p.startDate);
       const end = new Date(p.endDate);
 
@@ -671,44 +623,29 @@ async function mockRequest(endpoint, options) {
         status = "DaKetThuc";
       }
 
-      return {
-        ...p,
-        enrolledInterns: enrolledCount,
-        status: status,
-      };
+      return { ...p, enrolledInterns: enrolledCount, status: status };
     });
 
     return { success: true, data: data };
   }
 
-  // 15. MOCK: HR tạo mới Đợt thực tập gắn với Phòng ban
+  // 15. MOCK: HR tạo đợt thực tập mới
   if (endpoint === "/hr/programs" && method === "POST") {
     const programs = getMockPrograms();
 
     if (!body.name || !body.startDate || !body.endDate || !body.departmentId) {
-      const error = new Error(
-        "Tên đợt, phòng ban, ngày bắt đầu và kết thúc là bắt buộc!",
-      );
-      error.status = 400;
-      throw error;
-    }
-
-    if (new Date(body.endDate) <= new Date(body.startDate)) {
-      const error = new Error("Ngày kết thúc phải diễn ra sau ngày bắt đầu!");
+      const error = new Error("Tên đợt, phòng ban, ngày bắt đầu và kết thúc là bắt buộc!");
       error.status = 400;
       throw error;
     }
 
     const dept = DEFAULT_DEPARTMENTS.find((d) => d.id === body.departmentId);
-    const deptCode = dept ? dept.code : "GEN";
-    const deptName = dept ? dept.name : body.departmentName || "Phòng Kỹ thuật";
-
     const newProg = {
       id: Date.now(),
-      programCode: `CT-${deptCode}-${new Date().getFullYear()}-Q${Math.floor(new Date().getMonth() / 3) + 1}`,
+      programCode: `CT-${dept ? dept.code : "GEN"}-2026-Q4`,
       name: body.name,
       departmentId: body.departmentId,
-      departmentName: deptName,
+      departmentName: dept ? dept.name : "Phòng Kỹ thuật",
       startDate: body.startDate,
       endDate: body.endDate,
       targetInterns: Number(body.targetInterns) || 20,
@@ -718,77 +655,38 @@ async function mockRequest(endpoint, options) {
     programs.push(newProg);
     localStorage.setItem("mock_programs", JSON.stringify(programs));
 
-    return {
-      success: true,
-      message: "Tạo mới chương trình thực tập theo phòng ban thành công!",
-      data: newProg,
-    };
+    return { success: true, message: "Tạo đợt thực tập thành công!", data: newProg };
   }
 
-  // 16. MOCK: HR cập nhật chương trình thực tập
+  // 16. MOCK: HR cập nhật đợt thực tập
   if (endpoint.startsWith("/hr/programs/") && method === "PUT") {
     const id = Number(endpoint.split("/").pop());
     const programs = getMockPrograms();
 
-    if (new Date(body.endDate) <= new Date(body.startDate)) {
-      const error = new Error("Ngày kết thúc phải diễn ra sau ngày bắt đầu!");
-      error.status = 400;
-      throw error;
-    }
-
-    let found = false;
     const updatedPrograms = programs.map((p) => {
       if (p.id === id) {
-        found = true;
-        const dept = DEFAULT_DEPARTMENTS.find(
-          (d) => d.id === body.departmentId,
-        );
         return {
           ...p,
           name: body.name || p.name,
-          departmentId: body.departmentId || p.departmentId,
-          departmentName: dept
-            ? dept.name
-            : body.departmentName || p.departmentName,
           startDate: body.startDate || p.startDate,
           endDate: body.endDate || p.endDate,
-          targetInterns:
-            body.targetInterns !== undefined
-              ? Number(body.targetInterns)
-              : p.targetInterns,
-          description:
-            body.description !== undefined ? body.description : p.description,
+          targetInterns: body.targetInterns !== undefined ? Number(body.targetInterns) : p.targetInterns,
+          description: body.description !== undefined ? body.description : p.description,
         };
       }
       return p;
     });
 
-    if (!found) {
-      const error = new Error("Không tìm thấy đợt thực tập này!");
-      error.status = 404;
-      throw error;
-    }
-
     localStorage.setItem("mock_programs", JSON.stringify(updatedPrograms));
-    return {
-      success: true,
-      message: "Cập nhật chương trình thực tập thành công!",
-    };
+    return { success: true, message: "Cập nhật đợt thực tập thành công!" };
   }
 
-  // 17. MOCK: Lấy danh sách phòng ban kèm tải trọng Mentor
+  // 17. MOCK: Lấy danh sách phòng ban
   if (endpoint === "/hr/departments" && method === "GET") {
     const data = DEFAULT_DEPARTMENTS.map((dept) => {
-      const mentorsInDept = users.filter(
-        (u) => u.role === "Mentor" && u.department === dept.name,
-      );
-      const totalCapacity = mentorsInDept.reduce(
-        (sum, m) => sum + (m.maxInterns || 4),
-        0,
-      );
-      const currentAssigned = users.filter(
-        (u) => u.mentorId && mentorsInDept.some((m) => m.id === u.mentorId),
-      ).length;
+      const mentorsInDept = users.filter((u) => u.role === "Mentor" && u.department === dept.name);
+      const totalCapacity = mentorsInDept.reduce((sum, m) => sum + (m.maxInterns || 4), 0);
+      const currentAssigned = users.filter((u) => u.mentorId && mentorsInDept.some((m) => m.id === u.mentorId)).length;
 
       return {
         ...dept,
@@ -800,10 +698,333 @@ async function mockRequest(endpoint, options) {
     return { success: true, data };
   }
 
-  // Ném lỗi nếu không có endpoint nào khớp
-  throw new Error(
-    `[Mock Error] Endpoint "${endpoint}" với method "${method}" chưa được cấu hình.`,
-  );
+  // 18. MOCK: Lịch thực tập cá nhân
+  if (endpoint === "/intern/schedule" && method === "GET") {
+    const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
+    const current = users.find((u) => u.email === currentUser.email) || currentUser;
+
+    const programs = getMockPrograms();
+    const program = programs.find((p) => p.name === current.programName) || programs[0];
+
+    return {
+      success: true,
+      data: {
+        programInfo: {
+          programCode: program.programCode || "CT-IT-2026-Q4",
+          programName: program.name,
+          departmentName: program.departmentName || "Phòng Công nghệ Phần mềm",
+          mentorName: current.mentorName || "ThS. Hoàng Anh Tuấn",
+          startDate: program.startDate || "2026-10-01",
+          endDate: program.endDate || "2026-12-31",
+          workingShift: "Sáng: 08:00 - 12:00 | Chiều: 13:30 - 17:30 (Thứ 2 - Thứ 6)",
+          location: "Tầng 4 - Văn phòng Doanh nghiệp",
+        },
+        milestones: [
+          { id: 1, title: "Nhận đợt thực tập & Gặp gỡ Mentor", date: program.startDate || "2026-10-01", status: "completed" },
+          { id: 2, title: "Báo cáo tiến độ giữa kỳ", date: "2026-11-15", status: "upcoming" },
+          { id: 3, title: "Nộp Báo cáo tổng kết & Đánh giá kết quả", date: program.endDate || "2026-12-31", status: "upcoming" },
+        ],
+      },
+    };
+  }
+
+  // 19. MOCK: Mentor lấy danh sách sinh viên phụ trách (Có lọc chuẩn)
+  if (endpoint === "/mentor/interns" && method === "GET") {
+    const currentUser = JSON.parse(localStorage.getItem("user_info") || "{}");
+    const mentor = users.find((u) => u.email === currentUser.email);
+
+    let myInterns = users.filter((u) => u.role === "ThucTapSinh" || u.role === "Intern");
+    if (mentor) {
+      myInterns = myInterns.filter((u) => u.mentorId === mentor.id || u.mentorName === mentor.fullName);
+    }
+
+    if (myInterns.length === 0) {
+      myInterns = [
+        { id: 1, fullName: "Lạc Mạnh Tuấn", email: "tuan.lac@example.edu.vn", programName: "Đợt thực tập Thu Đông 2026 (Khóa K23)" },
+      ];
+    }
+
+    return { success: true, data: myInterns };
+  }
+
+  // 22. MOCK: Lấy danh sách nhiệm vụ
+  if (endpoint === "/intern/tasks" && method === "GET") {
+    let tasks = JSON.parse(localStorage.getItem("mock_intern_tasks") || "null");
+
+    if (!tasks) {
+      tasks = [
+        {
+          id: 1,
+          internId: 1,
+          title: "Tìm hiểu quy trình và nghiệp vụ thực tập doanh nghiệp",
+          description: "Đọc tài liệu onboard, tìm hiểu quy trình làm việc của phòng ban và vẽ sơ đồ nghiệp vụ.",
+          deadline: "2026-10-05",
+          priority: "high",
+          status: "in_progress",
+          progressPercent: 50,
+          note: "Đã hoàn thành tìm hiểu quy trình, đang hoàn thiện sơ đồ.",
+          proofUrl: "https://github.com/example/docs",
+        },
+        {
+          id: 2,
+          internId: 1,
+          title: "Kiểm thử tích hợp luồng nộp hồ sơ & báo cáo công việc",
+          description: "Thực hiện test case cho luồng nộp CV, ký hợp đồng và báo cáo công việc hàng tuần.",
+          deadline: "2026-10-10",
+          priority: "medium",
+          status: "todo",
+          progressPercent: 0,
+          note: "",
+          proofUrl: "",
+        },
+      ];
+      localStorage.setItem("mock_intern_tasks", JSON.stringify(tasks));
+    }
+
+    return { success: true, data: tasks };
+  }
+
+  // 23. MOCK: Cập nhật tiến độ nhiệm vụ
+  if (endpoint.startsWith("/intern/tasks/") && endpoint.endsWith("/progress") && method === "PUT") {
+    const taskId = Number(endpoint.split("/")[3]);
+    const tasks = JSON.parse(localStorage.getItem("mock_intern_tasks") || "[]");
+
+    const taskIndex = tasks.findIndex((t) => t.id === taskId);
+    if (taskIndex === -1) {
+      const error = new Error("Không tìm thấy nhiệm vụ này.");
+      error.status = 404;
+      throw error;
+    }
+
+    tasks[taskIndex] = {
+      ...tasks[taskIndex],
+      status: body.status || tasks[taskIndex].status,
+      progressPercent: Number(body.progressPercent) || 0,
+      note: body.note !== undefined ? body.note : tasks[taskIndex].note,
+      proofUrl: body.proofUrl !== undefined ? body.proofUrl : tasks[taskIndex].proofUrl,
+      updatedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("mock_intern_tasks", JSON.stringify(tasks));
+    return { success: true, message: "Cập nhật tiến độ nhiệm vụ thành công!", data: tasks[taskIndex] };
+  }
+
+  // 24. MOCK: Mentor Giao nhiệm vụ mới
+  if (endpoint === "/mentor/tasks" && method === "POST") {
+    const tasks = JSON.parse(localStorage.getItem("mock_intern_tasks") || "[]");
+
+    const newTask = {
+      id: Date.now(),
+      internId: Number(body.internId) || 1,
+      title: body.title,
+      description: body.description || "",
+      deadline: body.deadline,
+      priority: body.priority || "medium",
+      status: "todo",
+      progressPercent: 0,
+      note: "",
+      proofUrl: "",
+      createdAt: new Date().toISOString(),
+    };
+
+    tasks.unshift(newTask);
+    localStorage.setItem("mock_intern_tasks", JSON.stringify(tasks));
+
+    return { success: true, message: "Giao nhiệm vụ cho thực tập sinh thành công!", data: newTask };
+  }
+
+  // 25. MOCK: Mentor lấy danh sách Báo cáo tuần
+  if (endpoint === "/mentor/reports" && method === "GET") {
+    const reports = JSON.parse(localStorage.getItem("mock_weekly_reports") || "[]");
+
+    if (reports.length === 0) {
+      const defaultReports = [
+        {
+          id: 501,
+          weekNumber: 4,
+          title: "Báo cáo thực tập Tuần 4 - Xây dựng Module UI & Rest API",
+          achievements: "Đã thiết kế xong giao diện Dashboard, tích hợp xong các Mock API.",
+          difficulties: "Gặp một số vấn đề về đường dẫn tương đối khi Import ES Modules.",
+          nextWeekPlan: "Nghiên cứu thêm về bảo mật Route Guard.",
+          attachmentUrl: "https://drive.google.com/file/d/example/view",
+          status: "submitted",
+          isLate: false,
+          submittedAt: "2026-09-30T09:00:00Z",
+          score: null,
+          mentorFeedback: "",
+          fullName: "Lạc Mạnh Tuấn",
+          email: "tuan.lac@example.edu.vn",
+        },
+      ];
+      localStorage.setItem("mock_weekly_reports", JSON.stringify(defaultReports));
+      return { success: true, data: defaultReports };
+    }
+
+    return { success: true, data: reports };
+  }
+
+  // 26. MOCK: Mentor gửi Đánh giá & Chấm điểm Báo cáo tuần
+  if (endpoint.startsWith("/mentor/reports/") && endpoint.endsWith("/review") && method === "POST") {
+    const reportId = Number(endpoint.split("/")[3]);
+    const reports = JSON.parse(localStorage.getItem("mock_weekly_reports") || "[]");
+
+    const index = reports.findIndex((r) => r.id === reportId || r.weekNumber === reportId);
+    if (index === -1) {
+      const error = new Error("Không tìm thấy báo cáo này trên hệ thống!");
+      error.status = 404;
+      throw error;
+    }
+
+    reports[index] = {
+      ...reports[index],
+      score: Number(body.score),
+      mentorFeedback: body.mentorFeedback || "",
+      status: "reviewed",
+      reviewedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("mock_weekly_reports", JSON.stringify(reports));
+    return { success: true, message: "Đã gửi đánh giá và chấm điểm báo cáo tuần thành công!", data: reports[index] };
+  }
+
+  // 27. MOCK: Mentor lấy danh sách Đánh giá Final
+  if (endpoint === "/mentor/evaluations/final" && method === "GET") {
+    const evaluations = JSON.parse(localStorage.getItem("mock_final_evaluations") || "[]");
+    const interns = users.filter((u) => u.role === "ThucTapSinh" || u.role === "Intern");
+
+    const data = interns.map((intern) => {
+      const evalData = evaluations.find((e) => e.internId === intern.id) || null;
+      return {
+        internId: intern.id,
+        fullName: intern.fullName || "Lạc Mạnh Tuấn",
+        email: intern.email || "tuan.lac@example.edu.vn",
+        programName: intern.programName || "Đợt thực tập Thu Đông 2026",
+        isEvaluated: Boolean(evalData),
+        evaluation: evalData,
+      };
+    });
+
+    return { success: true, data };
+  }
+
+  // 28. MOCK: Mentor gửi Đánh giá Final
+  if (endpoint === "/mentor/evaluations/final" && method === "POST") {
+    const evaluations = JSON.parse(localStorage.getItem("mock_final_evaluations") || "[]");
+
+    const techScore = Number(body.technicalScore) || 0;
+    const attScore = Number(body.attitudeScore) || 0;
+    const learnScore = Number(body.learningScore) || 0;
+    const finalScore = Number((techScore * 0.5 + attScore * 0.3 + learnScore * 0.2).toFixed(2));
+
+    const newEval = {
+      id: Date.now(),
+      internId: Number(body.internId),
+      technicalScore: techScore,
+      attitudeScore: attScore,
+      learningScore: learnScore,
+      finalScore: finalScore,
+      strengths: body.strengths || "",
+      improvements: body.improvements || "",
+      overallComment: body.overallComment || "",
+      recommendHire: Boolean(body.recommendHire),
+      createdAt: new Date().toISOString(),
+    };
+
+    const index = evaluations.findIndex((e) => e.internId === newEval.internId);
+    if (index !== -1) {
+      evaluations[index] = newEval;
+    } else {
+      evaluations.push(newEval);
+    }
+    localStorage.setItem("mock_final_evaluations", JSON.stringify(evaluations));
+
+    return { success: true, message: "Đã gửi đánh giá tổng kết thực tập thành công!", data: newEval };
+  }
+
+  // 29. MOCK: HR lấy Báo cáo Tổng kết Cuối kỳ
+  if (endpoint.startsWith("/hr/reports/final-summary") && method === "GET") {
+    const evaluations = JSON.parse(localStorage.getItem("mock_final_evaluations") || "[]");
+    const reports = JSON.parse(localStorage.getItem("mock_weekly_reports") || "[]");
+    const interns = users.filter((u) => u.role === "ThucTapSinh" || u.role === "Intern");
+
+    let completedCount = 0;
+    let excellentCount = 0;
+    let goodCount = 0;
+    let averageCount = 0;
+    let totalScoreSum = 0;
+    let evaluatedCount = 0;
+
+    const internSummaries = interns.map((intern) => {
+      const evalData = evaluations.find((e) => e.internId === intern.id) || null;
+      const internReports = reports.filter((r) => r.email === intern.email);
+
+      const isEvaluated = Boolean(evalData || intern.isEvaluated);
+      const finalScore = evalData ? evalData.finalScore : (intern.finalScore || null);
+
+      let grade = "Chưa xếp loại";
+      if (finalScore !== null) {
+        evaluatedCount++;
+        totalScoreSum += finalScore;
+        if (finalScore >= 9.0) {
+          grade = "Xuất sắc";
+          excellentCount++;
+        } else if (finalScore >= 8.0) {
+          grade = "Giỏi";
+          goodCount++;
+        } else if (finalScore >= 6.5) {
+          grade = "Khá";
+          averageCount++;
+        } else {
+          grade = "Trung bình";
+        }
+      }
+
+      if (intern.status === "DaDuyet" && intern.contractStatus === "DaKy") {
+        completedCount++;
+      }
+
+      return {
+        internId: intern.id,
+        fullName: intern.fullName || "Thực tập sinh",
+        email: intern.email,
+        university: intern.university || "Đại học Công nghệ Thông tin & Truyền thông",
+        mentorName: intern.mentorName || "ThS. Hoàng Anh Tuấn",
+        submittedReportsCount: internReports.length,
+        finalScore: finalScore !== null ? finalScore : "---",
+        grade: grade,
+        recommendHire: evalData ? evalData.recommendHire : false,
+        isEvaluated: isEvaluated,
+      };
+    });
+
+    const avgGpa = evaluatedCount > 0 ? Number((totalScoreSum / evaluatedCount).toFixed(2)) : 0;
+
+    return {
+      success: true,
+      data: {
+        programInfo: {
+          programName: "Đợt thực tập Thu Đông 2026 (Khóa K23)",
+          departmentName: "Phòng Công nghệ Phần mềm",
+          startDate: "2026-10-01",
+          endDate: "2026-12-31",
+          totalInterns: interns.length,
+        },
+        kpiSummary: {
+          totalInterns: interns.length,
+          completedRate: interns.length > 0 ? `${Math.round((completedCount / interns.length) * 100)}%` : "0%",
+          averageGpa: avgGpa,
+          excellentCount: excellentCount,
+          goodCount: goodCount,
+          averageCount: averageCount,
+          recommendedHireCount: internSummaries.filter((i) => i.recommendHire).length,
+        },
+        internSummaries: internSummaries,
+      },
+    };
+  }
+
+  // Ném lỗi nếu không khớp endpoint nào
+  throw new Error(`[Mock Error] Endpoint "${endpoint}" với method "${method}" chưa được cấu hình.`);
 }
 
 async function request(endpoint, options = {}) {
@@ -843,7 +1064,6 @@ async function request(endpoint, options = {}) {
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      // Tự động điều hướng về Login khi Token hết hạn (401), ngoại trừ chính trang login
       if (response.status === 401 && !endpoint.includes("/auth/login")) {
         localStorage.removeItem("access_token");
         localStorage.removeItem("user_info");
@@ -856,9 +1076,7 @@ async function request(endpoint, options = {}) {
         return;
       }
 
-      const error = new Error(
-        (data && data.message) || "Có lỗi xảy ra trên hệ thống",
-      );
+      const error = new Error((data && data.message) || "Có lỗi xảy ra trên hệ thống");
       error.status = response.status;
       error.data = data;
       throw error;
@@ -871,16 +1089,14 @@ async function request(endpoint, options = {}) {
     if (error.name === "AbortError") {
       error.message = "Máy chủ phản hồi quá thời gian quy định (Timeout).";
     } else if (!error.status) {
-      error.message =
-        "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng hoặc máy chủ Backend!";
+      error.message = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng hoặc máy chủ Backend!";
     }
     throw error;
   }
 }
 
 export const api = {
-  get: (endpoint, options = {}) =>
-    request(endpoint, { ...options, method: "GET" }),
+  get: (endpoint, options = {}) => request(endpoint, { ...options, method: "GET" }),
 
   post: (endpoint, body, options = {}) => {
     const isFormData = body instanceof FormData;
@@ -900,6 +1116,5 @@ export const api = {
     });
   },
 
-  delete: (endpoint, options = {}) =>
-    request(endpoint, { ...options, method: "DELETE" }),
+  delete: (endpoint, options = {}) => request(endpoint, { ...options, method: "DELETE" }),
 };

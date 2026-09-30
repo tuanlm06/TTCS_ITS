@@ -9,10 +9,9 @@ function redirectByUserRole(user) {
     return;
   }
 
+  // CẬP NHẬT: Mở chuyển hướng sang Cổng Mentor
   if (role === "Mentor") {
-    alert("Tài khoản Mentor hiện chưa được hỗ trợ cổng giao diện riêng trên phiên bản này. Vui lòng liên hệ Quản trị viên HR!");
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user_info");
+    window.location.replace("../mentor/task-management.html");
     return;
   }
 
@@ -81,6 +80,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnLogin = document.getElementById("btnLogin");
   const btnSpinner = document.getElementById("btnSpinner");
   const btnText = document.getElementById("btnText");
+
+  // Nút điền nhanh tài khoản Demo
+  const btnFillMentor = document.getElementById("btnFillMentor");
+  const btnFillIntern = document.getElementById("btnFillIntern");
+  const btnFillHR = document.getElementById("btnFillHR");
+
+  if (btnFillMentor) {
+    btnFillMentor.addEventListener("click", () => {
+      emailInput.value = "tuan.hoang@company.com";
+      passwordInput.value = "123";
+      clearErrors();
+    });
+  }
+
+  if (btnFillIntern) {
+    btnFillIntern.addEventListener("click", () => {
+      emailInput.value = "tuan.lac@example.edu.vn";
+      passwordInput.value = "123";
+      clearErrors();
+    });
+  }
+
+  if (btnFillHR) {
+    btnFillHR.addEventListener("click", () => {
+      emailInput.value = "hr@company.com";
+      passwordInput.value = "123";
+      clearErrors();
+    });
+  }
 
   /**
    * Reset thông báo lỗi trên UI

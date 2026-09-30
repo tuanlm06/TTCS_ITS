@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nộp Báo Cáo Tuần - Internship System</title>
+    <!-- Đường dẫn lùi 2 cấp thư mục chuẩn -->
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/intern/reports.css" />
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Header Trang -->
+        <header class="top-header">
+            <div>
+                <h2>📝 Báo Cáo Thực Tập Tuần</h2>
+                <p class="sub-text">Gửi báo cáo kết quả công việc hàng tuần cho Mentor đánh giá</p>
+            </div>
+            <!-- Đường dẫn về Dashboard cùng thư mục -->
+            <a href="intern-dashboard.html" class="btn-back-sm">⬅️ Bảng điều khiển</a>
+        </header>
+
+        <!-- Nội dung chính -->
+        <main class="report-content">
+            <!-- Card Thông Tin Tuần & Deadline -->
+            <section class="card-box week-info-card">
+                <div class="week-header-flex">
+                    <div>
+                        <span class="label">Tuần thực tập hiện tại:</span>
+                        <h3 id="weekTitleDisp" class="week-title">Đang tải...</h3>
+                    </div>
+                    <div class="deadline-box">
+                        <span class="label">Hạn nộp báo cáo:</span>
+                        <strong id="deadlineDisp" class="deadline-time">Thứ Sáu, 17:00</strong>
+                    </div>
+                </div>
+                <div id="statusBanner" class="status-banner hidden"></div>
+            </section>
+
+            <!-- Card Form Nhập Báo Cáo -->
+            <section class="card-box form-card">
+                <h3 class="card-title">📌 Nội Dung Báo Cáo Tuần</h3>
+
+                <form id="weeklyReportForm">
+                    <input type="hidden" id="weekNumberInput" value="4" />
+
+                    <div class="form-group">
+                        <label class="form-label">Tiêu đề báo cáo <span class="required">*</span></label>
+                        <input type="text" id="reportTitleInput" class="form-control"
+                            placeholder="Ví dụ: Báo cáo thực tập Tuần 4 - Tích hợp UI/UX và API" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">1. Kết quả công việc đạt được trong tuần <span
+                                class="required">*</span></label>
+                        <textarea id="achievementsInput" rows="4" class="form-control"
+                            placeholder="- Đã hoàn thành các nhiệm vụ được giao...&#10;- Tìm hiểu thêm kiến thức về..."
+                            required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">2. Khó khăn / Vướng mắc gặp phải (nếu có)</label>
+                        <textarea id="difficultiesInput" rows="3" class="form-control"
+                            placeholder="Ghi rõ các vướng mắc cần Mentor hỗ trợ..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">3. Kế hoạch công việc tuần tiếp theo <span
+                                class="required">*</span></label>
+                        <textarea id="nextWeekPlanInput" rows="3" class="form-control"
+                            placeholder="- Tiếp tục hoàn thiện module...&#10;- Chuẩn bị báo cáo..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">4. Đường dẫn đính kèm sản phẩm / Báo cáo chi tiết (Link
+                            Git/Drive/PDF)</label>
+                        <input type="url" id="attachmentUrlInput" class="form-control"
+                            placeholder="https://drive.google.com/file/d/..." />
+                    </div>
+
+                    <!-- Nút Thao tác -->
+                    <div class="form-actions">
+                        <a href="intern-dashboard.html" class="btn-secondary">Hủy bỏ</a>
+                        <button type="submit" id="btnSubmitReport" class="btn-primary">
+                            🚀 Gửi Báo Cáo Tuần
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script đường dẫn chuẩn -->
+    <script type="module" src="../../js/intern/reports.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lịch Thực Tập Cá Nhân - Internship System</title>
+    <!-- CSS Hệ thống -->
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/intern/schedule.css" />
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Thanh Tiêu Đề Top -->
+        <header class="top-header">
+            <div class="header-title">
+                <h2>📅 Lịch Thực Tập Cá Nhân</h2>
+                <p class="sub-text">Theo dõi kế hoạch, ca làm việc và các cột mốc quan trọng</p>
+            </div>
+            <div class="user-profile-box">
+                <span id="dispStudentName" class="user-name">...</span>
+                <button id="btnLogout" class="btn-logout-sm">🚪 Đăng xuất</button>
+            </div>
+        </header>
+
+        <!-- Nội dung chính -->
+        <main class="schedule-content">
+            <!-- Khối Thông tin Đợt Thực Tập -->
+            <section class="card-box info-card">
+                <h3 class="card-title">📌 Thông Tin Chương Trình Thực Tập</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Mã chương trình:</span>
+                        <span id="progCode" class="value">...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Tên đợt thực tập:</span>
+                        <span id="progName" class="value highlight">...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Phòng ban tiếp nhận:</span>
+                        <span id="progDept" class="value">...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Mentor phụ trách:</span>
+                        <span id="progMentor" class="value">...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Thời gian thực tập:</span>
+                        <span id="progDates" class="value">...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Ca làm việc quy định:</span>
+                        <span id="progShift" class="value">...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Khối Tiến Độ & Cột Mốc Thời Gian (Timeline) -->
+            <section class="card-box timeline-card">
+                <h3 class="card-title">🎯 Cột Mốc Kế Hoạch & Tiến Độ</h3>
+                <div id="timelineList" class="timeline-container">
+                    <p class="text-loading">Đang tải lịch thực tập...</p>
+                </div>
+            </section>
+
+            <!-- Nút quay lại Bảng điều khiển -->
+            <div class="actions-footer">
+                <a href="intern-dashboard.html" class="btn-back">
+                    ⬅️ Quay lại Bảng Điều Khiển
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Controller JS -->
+    <script type="module" src="../../js/intern/schedule.js"></script>
+</body>
+
+</html>

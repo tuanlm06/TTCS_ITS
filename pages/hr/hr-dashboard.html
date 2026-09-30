@@ -1,773 +1,595 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cổng Quản Trị Nhân Sự (HR) - Quản Lý Thực Tập Sinh</title>
-    <!-- 1. CSS Dùng chung & Layout hệ thống -->
-    <link rel="stylesheet" href="../../css/style.css" />
-    <link rel="stylesheet" href="../../css/auth/dashboard.css" />
-    <!-- 2. CSS Riêng cho phân hệ HR -->
-    <link rel="stylesheet" href="../../css/hr/hr-dashboard.css" />
-  </head>
-  <body>
-    <div class="dashboard-wrapper">
-      <!-- Sidebar HR -->
-      <aside class="sidebar">
-        <div class="sidebar-brand">
-          <h2>HR Management</h2>
-          <span class="badge-role" style="background-color: #059669"
-            >Nhân sự (HR)</span
-          >
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cổng Quản Trị Nhân Sự (HR) - Quản Lý Thực Tập Sinh</title>
+  <!-- 1. CSS Dùng chung & Layout hệ thống -->
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="../../css/auth/dashboard.css" />
+  <!-- 2. CSS Riêng cho phân hệ HR -->
+  <link rel="stylesheet" href="../../css/hr/hr-dashboard.css" />
+</head>
+
+<body>
+  <div class="dashboard-wrapper">
+    <!-- Sidebar HR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>HR Management</h2>
+        <span class="badge-role" style="background-color: #059669">Nhân sự (HR)</span>
+      </div>
+
+      <nav class="sidebar-menu">
+        <a href="javascript:void(0)" id="menuCandidates" class="menu-item active">
+          <span class="icon">👥</span> Xét duyệt hồ sơ
+        </a>
+        <a href="javascript:void(0)" id="menuMentors" class="menu-item">
+          <span class="icon">👨‍🏫</span> Phân công Mentor
+        </a>
+        <a href="javascript:void(0)" id="menuPrograms" class="menu-item">
+          <span class="icon">📅</span> Đợt thực tập
+        </a>
+        <a href="final-report.html" class="menu-item">
+          <span class="icon">📈</span> Báo cáo tổng kết
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="btnLogout" class="btn-logout">
+          <span class="icon">🚪</span> Đăng xuất
+        </button>
+      </div>
+    </aside>
+
+    <!-- Khu vực làm việc chính -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="welcome-box">
+          <h1 id="pageHeaderTitle">Danh Sách Hồ Sơ Thực Tập Sinh</h1>
+          <p id="pageHeaderDesc">
+            Tiếp nhận, thẩm định hồ sơ ứng tuyển, ký kết hợp đồng và phân công
+            Mentor
+          </p>
         </div>
 
-        <nav class="sidebar-menu">
-          <a
-            href="javascript:void(0)"
-            id="menuCandidates"
-            class="menu-item active"
-          >
-            <span class="icon">👥</span> Xét duyệt hồ sơ
-          </a>
-          <a href="javascript:void(0)" id="menuMentors" class="menu-item">
-            <span class="icon">👨‍🏫</span> Phân công Mentor
-          </a>
-          <a href="javascript:void(0)" id="menuPrograms" class="menu-item">
-            <span class="icon">📅</span> Đợt thực tập
-          </a>
-          <a href="javascript:void(0)" id="menuReports" class="menu-item">
-            <span class="icon">📊</span> Báo cáo & Thống kê
-          </a>
-        </nav>
-
-        <div class="sidebar-footer">
-          <button id="btnLogout" class="btn-logout">
-            <span class="icon">🚪</span> Đăng xuất
-          </button>
+        <div class="user-profile-widget">
+          <div class="user-avatar" style="background-color: #059669">HR</div>
+          <div class="user-meta">
+            <span class="user-name" id="hrFullName">Cán bộ Tuyển dụng HR</span>
+            <span class="user-email" id="hrEmail">hr@company.com</span>
+          </div>
         </div>
-      </aside>
+      </header>
 
-      <!-- Khu vực làm việc chính -->
-      <main class="main-content">
-        <header class="topbar">
-          <div class="welcome-box">
-            <h1 id="pageHeaderTitle">Danh Sách Hồ Sơ Thực Tập Sinh</h1>
-            <p id="pageHeaderDesc">
-              Tiếp nhận, thẩm định hồ sơ ứng tuyển, ký kết hợp đồng và phân công
-              Mentor
-            </p>
-          </div>
-
-          <div class="user-profile-widget">
-            <div class="user-avatar" style="background-color: #059669">HR</div>
-            <div class="user-meta">
-              <span class="user-name" id="hrFullName"
-                >Cán bộ Tuyển dụng HR</span
-              >
-              <span class="user-email" id="hrEmail">hr@company.com</span>
-            </div>
-          </div>
-        </header>
-
-        <div class="content-body">
-          <!-- ===============================================================
+      <div class="content-body">
+        <!-- ===============================================================
                VIEW 1: QUẢN LÝ & XÉT DUYỆT HỒ SƠ ỨNG VIÊN (MẶC ĐỊNH HIỆN)
                =============================================================== -->
-          <div id="viewCandidateList">
-            <!-- Thống kê nhanh KPI -->
-            <section class="kpi-grid">
-              <div class="card kpi-card">
-                <div class="kpi-icon blue">📁</div>
-                <div class="kpi-info">
-                  <span class="kpi-label">Tổng hồ sơ tiếp nhận</span>
-                  <strong id="kpiTotal" class="kpi-value">0</strong>
-                </div>
+        <div id="viewCandidateList">
+          <!-- Thống kê nhanh KPI -->
+          <section class="kpi-grid">
+            <div class="card kpi-card">
+              <div class="kpi-icon blue">📁</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Tổng hồ sơ tiếp nhận</span>
+                <strong id="kpiTotal" class="kpi-value">0</strong>
               </div>
+            </div>
 
-              <div class="card kpi-card">
-                <div class="kpi-icon orange">⏳</div>
-                <div class="kpi-info">
-                  <span class="kpi-label">Hồ sơ chờ xét duyệt</span>
-                  <strong
-                    id="kpiPending"
-                    class="kpi-value"
-                    style="color: #d97706"
-                    >0</strong
-                  >
-                </div>
+            <div class="card kpi-card">
+              <div class="kpi-icon orange">⏳</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Hồ sơ chờ xét duyệt</span>
+                <strong id="kpiPending" class="kpi-value" style="color: #d97706">0</strong>
               </div>
+            </div>
 
-              <div class="card kpi-card">
-                <div class="kpi-icon green">✅</div>
-                <div class="kpi-info">
-                  <span class="kpi-label">Đã duyệt trúng tuyển</span>
-                  <strong
-                    id="kpiApproved"
-                    class="kpi-value"
-                    style="color: #16a34a"
-                    >0</strong
-                  >
-                </div>
+            <div class="card kpi-card">
+              <div class="kpi-icon green">✅</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Đã duyệt trúng tuyển</span>
+                <strong id="kpiApproved" class="kpi-value" style="color: #16a34a">0</strong>
               </div>
-            </section>
+            </div>
+          </section>
 
-            <!-- Tìm kiếm & Bộ lọc (US 3) -->
-            <section class="card filter-card">
-              <div class="filter-group">
-                <input
-                  type="text"
-                  id="searchInput"
-                  class="form-control"
-                  placeholder="🔍 Tìm theo họ tên, email hoặc mã hồ sơ..."
-                />
-              </div>
-              <div class="filter-group select-group">
-                <select id="filterUniversity" class="form-control">
-                  <option value="">-- Tất cả trường học --</option>
-                  <option value="ĐH Công nghệ Thông tin & Truyền thông">
-                    ĐH CNTT & Truyền thông (ICTU)
-                  </option>
-                  <option value="ĐH Kỹ thuật Công nghiệp">
-                    ĐH Kỹ thuật Công nghiệp (TNUT)
-                  </option>
-                </select>
-              </div>
-              <div class="filter-group select-group">
-                <select id="filterStatus" class="form-control">
-                  <option value="">-- Tất cả trạng thái --</option>
-                  <option value="ChoDuyet">Chờ duyệt</option>
-                  <option value="DaDuyet">Đã duyệt</option>
-                  <option value="TuChoi">Từ chối</option>
-                </select>
-              </div>
-              <button
-                id="btnResetFilter"
-                class="btn-secondary-sm"
-                style="height: 42px"
-              >
-                Đặt lại
-              </button>
-              <button
-                id="btnOpenCreateIntern"
-                class="btn-primary-sm"
-                style="
+          <!-- Tìm kiếm & Bộ lọc (US 3) -->
+          <section class="card filter-card">
+            <div class="filter-group">
+              <input type="text" id="searchInput" class="form-control"
+                placeholder="🔍 Tìm theo họ tên, email hoặc mã hồ sơ..." />
+            </div>
+            <div class="filter-group select-group">
+              <select id="filterUniversity" class="form-control">
+                <option value="">-- Tất cả trường học --</option>
+                <option value="ĐH Công nghệ Thông tin & Truyền thông">
+                  ĐH CNTT & Truyền thông (ICTU)
+                </option>
+                <option value="ĐH Kỹ thuật Công nghiệp">
+                  ĐH Kỹ thuật Công nghiệp (TNUT)
+                </option>
+              </select>
+            </div>
+            <div class="filter-group select-group">
+              <select id="filterStatus" class="form-control">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="ChoDuyet">Chờ duyệt</option>
+                <option value="DaDuyet">Đã duyệt</option>
+                <option value="TuChoi">Từ chối</option>
+              </select>
+            </div>
+            <button id="btnResetFilter" class="btn-secondary-sm" style="height: 42px">
+              Đặt lại
+            </button>
+            <button id="btnOpenCreateIntern" class="btn-primary-sm" style="
                   background-color: #059669;
                   height: 42px;
                   white-space: nowrap;
-                "
-              >
-                ➕ Thêm thực tập sinh
-              </button>
-            </section>
+                ">
+              ➕ Thêm thực tập sinh
+            </button>
+          </section>
 
-            <!-- Bảng danh sách ứng viên -->
-            <section class="card table-card">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Mã hồ sơ</th>
-                    <th>Ứng viên</th>
-                    <th>Trường / Ngành</th>
-                    <th>Vị trí ứng tuyển</th>
-                    <th>Tài liệu CV</th>
-                    <th>Trạng thái</th>
-                    <th>Mentor phụ trách</th>
-                    <th style="text-align: center; min-width: 190px">
-                      Hành động
-                    </th>
-                  </tr>
-                </thead>
-                <tbody id="candidateTableBody">
-                  <tr>
-                    <td colspan="8" class="empty-state">
-                      Đang nạp danh sách hồ sơ...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </section>
-          </div>
+          <!-- Bảng danh sách ứng viên -->
+          <section class="card table-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã hồ sơ</th>
+                  <th>Ứng viên</th>
+                  <th>Trường / Ngành</th>
+                  <th>Vị trí ứng tuyển</th>
+                  <th>Tài liệu CV</th>
+                  <th>Trạng thái</th>
+                  <th>Mentor phụ trách</th>
+                  <th style="text-align: center; min-width: 190px">
+                    Hành động
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="candidateTableBody">
+                <tr>
+                  <td colspan="8" class="empty-state">
+                    Đang nạp danh sách hồ sơ...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
 
-          <!-- ===============================================================
+        <!-- ===============================================================
                VIEW 2: BẢNG THEO DÕI & TẢI TRỌNG MENTOR
                =============================================================== -->
-          <div id="viewMentorList" class="hidden">
-            <section class="card table-card" style="margin-top: 0">
-              <div
-                style="
+        <div id="viewMentorList" class="hidden">
+          <section class="card table-card" style="margin-top: 0">
+            <div style="
                   padding: 16px 20px;
                   border-bottom: 1px solid #e2e8f0;
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
-                "
-              >
-                <div>
-                  <h3 style="margin: 0; color: #1e293b; font-size: 1.1rem">
-                    Đội Ngũ Mentor & Tải Trọng Hướng Dẫn
-                  </h3>
-                  <p
-                    style="margin: 4px 0 0; font-size: 0.85rem; color: #64748b"
-                  >
-                    Theo dõi số lượng thực tập sinh được phân bổ cho từng người
-                    hướng dẫn
-                  </p>
-                </div>
-                <span
-                  class="badge-status"
-                  style="background: #e0f2fe; color: #0369a1; font-weight: 600"
-                >
-                  Dữ liệu thời gian thực
-                </span>
+                ">
+              <div>
+                <h3 style="margin: 0; color: #1e293b; font-size: 1.1rem">
+                  Đội Ngũ Mentor & Tải Trọng Hướng Dẫn
+                </h3>
+                <p style="margin: 4px 0 0; font-size: 0.85rem; color: #64748b">
+                  Theo dõi số lượng thực tập sinh được phân bổ cho từng người
+                  hướng dẫn
+                </p>
               </div>
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Mã Mentor</th>
-                    <th>Người hướng dẫn</th>
-                    <th>Phòng ban / Chức danh</th>
-                    <th>Tải trọng (Hiện tại / Tối đa)</th>
-                    <th>Thực tập sinh phụ trách</th>
-                    <th style="text-align: center">Trạng thái tiếp nhận</th>
-                  </tr>
-                </thead>
-                <tbody id="mentorTableBody">
-                  <tr>
-                    <td colspan="6" class="empty-state">
-                      Đang nạp dữ liệu đội ngũ Mentor...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </section>
-          </div>
+              <span class="badge-status" style="background: #e0f2fe; color: #0369a1; font-weight: 600">
+                Dữ liệu thời gian thực
+              </span>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã Mentor</th>
+                  <th>Người hướng dẫn</th>
+                  <th>Phòng ban / Chức danh</th>
+                  <th>Tải trọng (Hiện tại / Tối đa)</th>
+                  <th>Thực tập sinh phụ trách</th>
+                  <th style="text-align: center">Trạng thái tiếp nhận</th>
+                  <th style="text-align: center">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="mentorTableBody">
+                <tr>
+                  <td colspan="7" class="empty-state">
+                    Đang nạp dữ liệu đội ngũ Mentor...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
 
-          <!-- ===============================================================
+        <!-- ===============================================================
                VIEW 3: QUẢN LÝ ĐỢT THỰC TẬP THEO PHÒNG BAN (US 13)
                =============================================================== -->
-          <div id="viewProgramList" class="hidden">
-            <section class="card table-card" style="margin-top: 0">
-              <div
-                style="
+        <div id="viewProgramList" class="hidden">
+          <section class="card table-card" style="margin-top: 0">
+            <div style="
                   padding: 16px 20px;
                   border-bottom: 1px solid #e2e8f0;
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
                   gap: 16px;
-                "
-              >
-                <div>
-                  <h3 style="margin: 0; color: #1e293b; font-size: 1.1rem">
-                    Đợt Thực Tập & Kế Hoạch Theo Phòng Ban
-                  </h3>
-                  <p
-                    style="margin: 4px 0 0; font-size: 0.85rem; color: #64748b"
-                  >
-                    Thiết lập chương trình thực tập theo từng khối chuyên môn,
-                    phân bổ chỉ tiêu và thời gian
-                  </p>
-                </div>
-                <button
-                  id="btnOpenCreateProgram"
-                  class="btn-primary-sm"
-                  style="
+                ">
+              <div>
+                <h3 style="margin: 0; color: #1e293b; font-size: 1.1rem">
+                  Đợt Thực Tập & Kế Hoạch Theo Phòng Ban
+                </h3>
+                <p style="margin: 4px 0 0; font-size: 0.85rem; color: #64748b">
+                  Thiết lập chương trình thực tập theo từng khối chuyên môn,
+                  phân bổ chỉ tiêu và thời gian
+                </p>
+              </div>
+              <button id="btnOpenCreateProgram" class="btn-primary-sm" style="
                     background-color: #059669;
                     padding: 8px 14px;
                     font-weight: 600;
-                  "
-                >
-                  + Thêm đợt thực tập
-                </button>
-              </div>
+                  ">
+                + Thêm đợt thực tập
+              </button>
+            </div>
 
-              <!-- Bộ lọc phòng ban cho đợt thực tập -->
-              <div
-                style="
+            <!-- Bộ lọc phòng ban cho đợt thực tập -->
+            <div style="
                   padding: 12px 20px;
                   background-color: #f8fafc;
                   border-bottom: 1px solid #e2e8f0;
                   display: flex;
                   gap: 12px;
                   align-items: center;
-                "
-              >
-                <label
-                  style="font-size: 0.85rem; color: #475569; font-weight: 600"
-                  >Lọc theo phòng ban:</label
-                >
-                <select
-                  id="filterProgramDept"
-                  class="form-control"
-                  style="max-width: 320px; height: 38px"
-                >
-                  <option value="">-- Tất cả phòng ban --</option>
-                </select>
-              </div>
+                ">
+              <label style="font-size: 0.85rem; color: #475569; font-weight: 600">Lọc theo phòng ban:</label>
+              <select id="filterProgramDept" class="form-control" style="max-width: 320px; height: 38px">
+                <option value="">-- Tất cả phòng ban --</option>
+              </select>
+            </div>
 
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Mã đợt</th>
-                    <th>Tên đợt thực tập</th>
-                    <th>Phòng ban phụ trách</th>
-                    <th>Bắt đầu</th>
-                    <th>Kết thúc</th>
-                    <th>Thời lượng</th>
-                    <th>Chỉ tiêu</th>
-                    <th>Trạng thái</th>
-                    <th style="text-align: center">Hành động</th>
-                  </tr>
-                </thead>
-                <tbody id="programTableBody">
-                  <tr>
-                    <td colspan="9" class="empty-state">
-                      Đang nạp dữ liệu đợt thực tập...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </section>
-          </div>
-        </div>
-      </main>
-    </div>
-
-    <!-- Modal 1: Xem CV trực tiếp -->
-    <div id="cvModal" class="modal-backdrop hidden">
-      <div class="modal-box modal-lg">
-        <div class="modal-header">
-          <h3 id="modalCvTitle">Chi tiết CV ứng viên</h3>
-          <button id="btnCloseCvModal" class="modal-close-btn">&times;</button>
-        </div>
-        <div class="modal-body" style="height: 500px; padding: 0">
-          <iframe
-            id="cvIframe"
-            src=""
-            width="100%"
-            height="100%"
-            frameborder="0"
-          ></iframe>
-        </div>
-        <div class="modal-footer">
-          <button id="btnCloseCvModalFooter" class="btn-primary-sm">
-            Đóng
-          </button>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã đợt</th>
+                  <th>Tên đợt thực tập</th>
+                  <th>Phòng ban phụ trách</th>
+                  <th>Bắt đầu</th>
+                  <th>Kết thúc</th>
+                  <th>Thời lượng</th>
+                  <th>Chỉ tiêu</th>
+                  <th>Trạng thái</th>
+                  <th style="text-align: center">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="programTableBody">
+                <tr>
+                  <td colspan="9" class="empty-state">
+                    Đang nạp dữ liệu đợt thực tập...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
+  </div>
 
-    <!-- Modal 2: Từ chối hồ sơ (US 7) -->
-    <div id="rejectModal" class="modal-backdrop hidden">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>Lý do từ chối hồ sơ</h3>
-          <button id="btnCloseRejectModal" class="modal-close-btn">
-            &times;
-          </button>
-        </div>
+  <!-- Modal 1: Xem CV trực tiếp -->
+  <div id="cvModal" class="modal-backdrop hidden">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3 id="modalCvTitle">Chi tiết CV ứng viên</h3>
+        <button id="btnCloseCvModal" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="height: 500px; padding: 0">
+        <iframe id="cvIframe" src="" width="100%" height="100%" frameborder="0"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCloseCvModalFooter" class="btn-primary-sm">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Từ chối hồ sơ (US 7) -->
+  <div id="rejectModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Lý do từ chối hồ sơ</h3>
+        <button id="btnCloseRejectModal" class="modal-close-btn">
+          &times;
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Vui lòng ghi rõ lý do để hệ thống thông báo cho ứng viên:</p>
+        <textarea id="rejectReasonInput" class="form-control" rows="4"
+          placeholder="Ví dụ: Chưa đạt yêu cầu kỹ năng đầu vào / Thiếu chứng chỉ..."></textarea>
+        <span class="error-msg" id="rejectReasonError"></span>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelReject" class="btn-secondary-sm">Hủy bỏ</button>
+        <button id="btnConfirmReject" class="btn-danger-sm">
+          Xác nhận Từ chối
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Chỉnh sửa thông tin thực tập sinh (US 2) -->
+  <div id="editInternModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Chỉnh sửa hồ sơ thực tập sinh</h3>
+        <button id="btnCloseEditModal" class="modal-close-btn">
+          &times;
+        </button>
+      </div>
+      <form id="formEditIntern" novalidate>
         <div class="modal-body">
-          <p>Vui lòng ghi rõ lý do để hệ thống thông báo cho ứng viên:</p>
-          <textarea
-            id="rejectReasonInput"
-            class="form-control"
-            rows="4"
-            placeholder="Ví dụ: Chưa đạt yêu cầu kỹ năng đầu vào / Thiếu chứng chỉ..."
-          ></textarea>
-          <span class="error-msg" id="rejectReasonError"></span>
+          <input type="hidden" id="editCandidateId" />
+
+          <div class="form-group">
+            <label class="form-label">Email đăng nhập (Không thể thay đổi)</label>
+            <input type="email" id="editEmail" class="form-control" disabled
+              style="background-color: #f1f5f9; cursor: not-allowed" />
+          </div>
+
+          <div class="form-group">
+            <label for="editFullName" class="form-label">Họ và tên <span class="required">*</span></label>
+            <input type="text" id="editFullName" class="form-control" />
+            <span class="error-msg" id="editFullNameError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="editPhone" class="form-label">Số điện thoại</label>
+            <input type="tel" id="editPhone" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label for="editUniversity" class="form-label">Trường Đại học/Cao đẳng <span
+                class="required">*</span></label>
+            <input type="text" id="editUniversity" class="form-control" />
+            <span class="error-msg" id="editUniversityError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="editMajor" class="form-label">Chuyên ngành đào tạo</label>
+            <input type="text" id="editMajor" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label for="editPosition" class="form-label">Vị trí ứng tuyển</label>
+            <input type="text" id="editPosition" class="form-control" />
+          </div>
         </div>
         <div class="modal-footer">
-          <button id="btnCancelReject" class="btn-secondary-sm">Hủy bỏ</button>
-          <button id="btnConfirmReject" class="btn-danger-sm">
-            Xác nhận Từ chối
+          <button type="button" id="btnCancelEdit" class="btn-secondary-sm">
+            Hủy
+          </button>
+          <button type="submit" id="btnSubmitEdit" class="btn-primary-sm">
+            Lưu thay đổi
           </button>
         </div>
-      </div>
+      </form>
     </div>
+  </div>
 
-    <!-- Modal 3: Chỉnh sửa thông tin thực tập sinh (US 2) -->
-    <div id="editInternModal" class="modal-backdrop hidden">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>Chỉnh sửa hồ sơ thực tập sinh</h3>
-          <button id="btnCloseEditModal" class="modal-close-btn">
-            &times;
-          </button>
-        </div>
-        <form id="formEditIntern" novalidate>
-          <div class="modal-body">
-            <input type="hidden" id="editCandidateId" />
-
-            <div class="form-group">
-              <label class="form-label"
-                >Email đăng nhập (Không thể thay đổi)</label
-              >
-              <input
-                type="email"
-                id="editEmail"
-                class="form-control"
-                disabled
-                style="background-color: #f1f5f9; cursor: not-allowed"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="editFullName" class="form-label"
-                >Họ và tên <span class="required">*</span></label
-              >
-              <input type="text" id="editFullName" class="form-control" />
-              <span class="error-msg" id="editFullNameError"></span>
-            </div>
-
-            <div class="form-group">
-              <label for="editPhone" class="form-label">Số điện thoại</label>
-              <input type="tel" id="editPhone" class="form-control" />
-            </div>
-
-            <div class="form-group">
-              <label for="editUniversity" class="form-label"
-                >Trường Đại học/Cao đẳng <span class="required">*</span></label
-              >
-              <input type="text" id="editUniversity" class="form-control" />
-              <span class="error-msg" id="editUniversityError"></span>
-            </div>
-
-            <div class="form-group">
-              <label for="editMajor" class="form-label"
-                >Chuyên ngành đào tạo</label
-              >
-              <input type="text" id="editMajor" class="form-control" />
-            </div>
-
-            <div class="form-group">
-              <label for="editPosition" class="form-label"
-                >Vị trí ứng tuyển</label
-              >
-              <input type="text" id="editPosition" class="form-control" />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" id="btnCancelEdit" class="btn-secondary-sm">
-              Hủy
-            </button>
-            <button type="submit" id="btnSubmitEdit" class="btn-primary-sm">
-              Lưu thay đổi
-            </button>
-          </div>
-        </form>
+  <!-- Modal 4: Phân công Mentor Hướng Dẫn (US 12) -->
+  <div id="assignMentorModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Phân công Mentor Hướng Dẫn</h3>
+        <button type="button" id="btnCloseAssignModal" class="modal-close-btn">
+          &times;
+        </button>
       </div>
-    </div>
+      <form id="formAssignMentor" novalidate>
+        <div class="modal-body">
+          <input type="hidden" id="assignInternId" />
 
-    <!-- Modal 4: Phân công Mentor Hướng Dẫn (US 12) -->
-    <div id="assignMentorModal" class="modal-backdrop hidden">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>Phân công Mentor Hướng Dẫn</h3>
-          <button
-            type="button"
-            id="btnCloseAssignModal"
-            class="modal-close-btn"
-          >
-            &times;
-          </button>
-        </div>
-        <form id="formAssignMentor" novalidate>
-          <div class="modal-body">
-            <input type="hidden" id="assignInternId" />
-
-            <div
-              style="
+          <!-- Trường hợp 1: Khi gán từ danh sách ứng viên (đã xác định sinh viên cụ thể) -->
+          <div id="assignInternStaticBox" style="
                 background-color: #f8fafc;
                 border: 1px solid #e2e8f0;
                 border-radius: 6px;
                 padding: 12px;
                 margin-bottom: 16px;
-              "
-            >
-              <div
-                style="font-weight: 600; color: #1e293b; font-size: 0.95rem"
-                id="assignInternName"
-              >
-                ...
-              </div>
-              <div
-                style="font-size: 0.85rem; color: #64748b"
-                id="assignInternMeta"
-              >
-                ...
-              </div>
+              ">
+            <div style="font-weight: 600; color: #1e293b; font-size: 0.95rem" id="assignInternName">
+              ...
             </div>
+            <div style="font-size: 0.85rem; color: #64748b" id="assignInternMeta">
+              ...
+            </div>
+          </div>
 
+          <!-- Trường hợp 2: Khi gán từ giao diện Mentor (cho phép chọn sinh viên từ danh sách) -->
+          <div id="assignInternSelectGroup" class="form-group hidden">
+            <label for="selectIntern" class="form-label">Chọn Thực tập sinh cần phân công <span
+                class="required">*</span></label>
+            <select id="selectIntern" class="form-control">
+              <option value="">-- Chọn thực tập sinh --</option>
+            </select>
+            <span class="error-msg" id="selectInternError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="assignProgram" class="form-label">Chương trình / Đợt thực tập
+              <span class="required">*</span></label>
+            <select id="assignProgram" class="form-control">
+              <option value="">-- Đang nạp danh sách đợt... --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="selectMentor" class="form-label">Chọn Mentor phụ trách <span class="required">*</span></label>
+            <select id="selectMentor" class="form-control">
+              <option value="">-- Đang tải danh sách Mentor... --</option>
+            </select>
+            <span class="error-msg" id="selectMentorError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="assignNote" class="form-label">Ghi chú / Đề tài hướng dẫn ban đầu</label>
+            <textarea id="assignNote" class="form-control" rows="3"
+              placeholder="Nhập dự án hoặc hướng nghiên cứu đề xuất cho sinh viên..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btnCancelAssign" class="btn-secondary-sm">
+            Hủy bỏ
+          </button>
+          <button type="submit" id="btnSubmitAssign" class="btn-primary-sm" style="background-color: #059669">
+            Lưu phân công
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 5: Thiết lập đợt thực tập theo Phòng ban (US 13) -->
+  <div id="programModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="programModalTitle">Thiết lập đợt thực tập theo phòng ban</h3>
+        <button type="button" id="btnCloseProgramModal" class="modal-close-btn">
+          &times;
+        </button>
+      </div>
+      <form id="formProgramTime" novalidate>
+        <div class="modal-body">
+          <input type="hidden" id="editProgramId" />
+
+          <!-- Chọn Phòng ban tiếp nhận -->
+          <div class="form-group">
+            <label for="programDepartmentInput" class="form-label">
+              Phòng ban phụ trách <span class="required">*</span>
+            </label>
+            <select id="programDepartmentInput" class="form-control">
+              <option value="">-- Chọn phòng ban --</option>
+            </select>
+            <div id="deptCapacityHint" style="font-size: 0.8rem; color: #0284c7; margin-top: 4px"></div>
+            <span class="error-msg" id="programDepartmentError"></span>
+          </div>
+
+          <!-- Tên đợt thực tập -->
+          <div class="form-group">
+            <label for="programNameInput" class="form-label">
+              Tên đợt thực tập <span class="required">*</span>
+            </label>
+            <input id="programNameInput" class="form-control"
+              placeholder="Ví dụ: Đợt thực tập Frontend K23 - Khối CNTT" />
+            <span class="error-msg" id="programNameError"></span>
+          </div>
+
+          <!-- Ngày bắt đầu & kết thúc -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
             <div class="form-group">
-              <label for="assignProgram" class="form-label"
-                >Chương trình / Đợt thực tập
-                <span class="required">*</span></label
-              >
-              <select id="assignProgram" class="form-control">
+              <label for="startDateInput" class="form-label">
+                Ngày bắt đầu <span class="required">*</span>
+              </label>
+              <input type="date" id="startDateInput" class="form-control" />
+              <span class="error-msg" id="startDateError"></span>
+            </div>
+            <div class="form-group">
+              <label for="endDateInput" class="form-label">
+                Ngày kết thúc <span class="required">*</span>
+              </label>
+              <input type="date" id="endDateInput" class="form-control" />
+              <span class="error-msg" id="endDateError"></span>
+            </div>
+          </div>
+
+          <!-- Chỉ tiêu sinh viên -->
+          <div class="form-group">
+            <label for="targetInternsInput" class="form-label">Chỉ tiêu thực tập sinh</label>
+            <input type="number" id="targetInternsInput" class="form-control" min="1" max="200" value="20" />
+          </div>
+
+          <!-- Mô tả -->
+          <div class="form-group">
+            <label for="programDescInput" class="form-label">Mô tả / Yêu cầu chuyên môn</label>
+            <textarea id="programDescInput" class="form-control" rows="3"
+              placeholder="Yêu cầu kỹ năng đầu vào (Git, HTML/CSS, JS, DB...)"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnCancelProgramModal" class="btn-secondary-sm">
+            Hủy
+          </button>
+          <button type="submit" class="btn-primary-sm" style="background-color: #059669">
+            Lưu đợt thực tập
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Modal 6: HR Thêm mới hồ sơ thực tập sinh -->
+  <div id="createInternModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Thêm Mới Hồ Sơ Thực Tập Sinh</h3>
+        <button type="button" id="btnCloseCreateInternModal" class="modal-close-btn">
+          &times;
+        </button>
+      </div>
+      <form id="formCreateIntern" novalidate>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="createFullName" class="form-label">Họ và tên <span class="required">*</span></label>
+            <input type="text" id="createFullName" class="form-control" placeholder="Ví dụ: Nguyễn Văn An" />
+            <span class="error-msg" id="createFullNameError"></span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+            <div class="form-group">
+              <label for="createEmail" class="form-label">Email tài khoản <span class="required">*</span></label>
+              <input type="email" id="createEmail" class="form-control" placeholder="an.nguyen@example.com" />
+              <span class="error-msg" id="createEmailError"></span>
+            </div>
+            <div class="form-group">
+              <label for="createPhone" class="form-label">Số điện thoại</label>
+              <input type="tel" id="createPhone" class="form-control" placeholder="0987654321" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+            <div class="form-group">
+              <label for="createUniversity" class="form-label">Trường đào tạo <span class="required">*</span></label>
+              <input type="text" id="createUniversity" class="form-control"
+                placeholder="Ví dụ: ĐH CNTT & Truyền thông" />
+              <span class="error-msg" id="createUniversityError"></span>
+            </div>
+            <div class="form-group">
+              <label for="createMajor" class="form-label">Chuyên ngành</label>
+              <input type="text" id="createMajor" class="form-control" placeholder="Ví dụ: Công nghệ Thông tin" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+            <div class="form-group">
+              <label for="createPosition" class="form-label">Vị trí thực tập</label>
+              <input type="text" id="createPosition" class="form-control" placeholder="Frontend Developer" />
+            </div>
+            <div class="form-group">
+              <label for="createProgramSelect" class="form-label">Đợt tiếp nhận</label>
+              <select id="createProgramSelect" class="form-control">
                 <option value="">-- Đang nạp danh sách đợt... --</option>
               </select>
             </div>
-
-            <div class="form-group">
-              <label for="selectMentor" class="form-label"
-                >Chọn Mentor phụ trách <span class="required">*</span></label
-              >
-              <select id="selectMentor" class="form-control">
-                <option value="">-- Đang tải danh sách Mentor... --</option>
-              </select>
-              <span class="error-msg" id="selectMentorError"></span>
-            </div>
-
-            <div class="form-group">
-              <label for="assignNote" class="form-label"
-                >Ghi chú / Đề tài hướng dẫn ban đầu</label
-              >
-              <textarea
-                id="assignNote"
-                class="form-control"
-                rows="3"
-                placeholder="Nhập dự án hoặc hướng nghiên cứu đề xuất cho sinh viên..."
-              ></textarea>
-            </div>
           </div>
 
-          <div class="modal-footer">
-            <button type="button" id="btnCancelAssign" class="btn-secondary-sm">
-              Hủy bỏ
-            </button>
-            <button
-              type="submit"
-              id="btnSubmitAssign"
-              class="btn-primary-sm"
-              style="background-color: #059669"
-            >
-              Lưu phân công
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Modal 5: Thiết lập đợt thực tập theo Phòng ban (US 13) -->
-    <div id="programModal" class="modal-backdrop hidden">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3 id="programModalTitle">Thiết lập đợt thực tập theo phòng ban</h3>
-          <button
-            type="button"
-            id="btnCloseProgramModal"
-            class="modal-close-btn"
-          >
-            &times;
-          </button>
-        </div>
-        <form id="formProgramTime" novalidate>
-          <div class="modal-body">
-            <input type="hidden" id="editProgramId" />
-
-            <!-- Chọn Phòng ban tiếp nhận -->
-            <div class="form-group">
-              <label for="programDepartmentInput" class="form-label">
-                Phòng ban phụ trách <span class="required">*</span>
-              </label>
-              <select id="programDepartmentInput" class="form-control">
-                <option value="">-- Chọn phòng ban --</option>
-              </select>
-              <div
-                id="deptCapacityHint"
-                style="font-size: 0.8rem; color: #0284c7; margin-top: 4px"
-              ></div>
-              <span class="error-msg" id="programDepartmentError"></span>
-            </div>
-
-            <!-- Tên đợt thực tập -->
-            <div class="form-group">
-              <label for="programNameInput" class="form-label">
-                Tên đợt thực tập <span class="required">*</span>
-              </label>
-              <input
-                id="programNameInput"
-                class="form-control"
-                placeholder="Ví dụ: Đợt thực tập Frontend K23 - Khối CNTT"
-              />
-              <span class="error-msg" id="programNameError"></span>
-            </div>
-
-            <!-- Ngày bắt đầu & kết thúc -->
-            <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
-            >
-              <div class="form-group">
-                <label for="startDateInput" class="form-label">
-                  Ngày bắt đầu <span class="required">*</span>
-                </label>
-                <input type="date" id="startDateInput" class="form-control" />
-                <span class="error-msg" id="startDateError"></span>
-              </div>
-              <div class="form-group">
-                <label for="endDateInput" class="form-label">
-                  Ngày kết thúc <span class="required">*</span>
-                </label>
-                <input type="date" id="endDateInput" class="form-control" />
-                <span class="error-msg" id="endDateError"></span>
-              </div>
-            </div>
-
-            <!-- Chỉ tiêu sinh viên -->
-            <div class="form-group">
-              <label for="targetInternsInput" class="form-label"
-                >Chỉ tiêu thực tập sinh</label
-              >
-              <input
-                type="number"
-                id="targetInternsInput"
-                class="form-control"
-                min="1"
-                max="200"
-                value="20"
-              />
-            </div>
-
-            <!-- Mô tả -->
-            <div class="form-group">
-              <label for="programDescInput" class="form-label"
-                >Mô tả / Yêu cầu chuyên môn</label
-              >
-              <textarea
-                id="programDescInput"
-                class="form-control"
-                rows="3"
-                placeholder="Yêu cầu kỹ năng đầu vào (Git, HTML/CSS, JS, DB...)"
-              ></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              id="btnCancelProgramModal"
-              class="btn-secondary-sm"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              class="btn-primary-sm"
-              style="background-color: #059669"
-            >
-              Lưu đợt thực tập
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-    <!-- Modal 6: HR Thêm mới hồ sơ thực tập sinh -->
-    <div id="createInternModal" class="modal-backdrop hidden">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>Thêm Mới Hồ Sơ Thực Tập Sinh</h3>
-          <button
-            type="button"
-            id="btnCloseCreateInternModal"
-            class="modal-close-btn"
-          >
-            &times;
-          </button>
-        </div>
-        <form id="formCreateIntern" novalidate>
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="createFullName" class="form-label"
-                >Họ và tên <span class="required">*</span></label
-              >
-              <input
-                type="text"
-                id="createFullName"
-                class="form-control"
-                placeholder="Ví dụ: Nguyễn Văn An"
-              />
-              <span class="error-msg" id="createFullNameError"></span>
-            </div>
-
-            <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
-            >
-              <div class="form-group">
-                <label for="createEmail" class="form-label"
-                  >Email tài khoản <span class="required">*</span></label
-                >
-                <input
-                  type="email"
-                  id="createEmail"
-                  class="form-control"
-                  placeholder="an.nguyen@example.com"
-                />
-                <span class="error-msg" id="createEmailError"></span>
-              </div>
-              <div class="form-group">
-                <label for="createPhone" class="form-label"
-                  >Số điện thoại</label
-                >
-                <input
-                  type="tel"
-                  id="createPhone"
-                  class="form-control"
-                  placeholder="0987654321"
-                />
-              </div>
-            </div>
-
-            <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
-            >
-              <div class="form-group">
-                <label for="createUniversity" class="form-label"
-                  >Trường đào tạo <span class="required">*</span></label
-                >
-                <input
-                  type="text"
-                  id="createUniversity"
-                  class="form-control"
-                  placeholder="Ví dụ: ĐH CNTT & Truyền thông"
-                />
-                <span class="error-msg" id="createUniversityError"></span>
-              </div>
-              <div class="form-group">
-                <label for="createMajor" class="form-label">Chuyên ngành</label>
-                <input
-                  type="text"
-                  id="createMajor"
-                  class="form-control"
-                  placeholder="Ví dụ: Công nghệ Thông tin"
-                />
-              </div>
-            </div>
-
-            <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
-            >
-              <div class="form-group">
-                <label for="createPosition" class="form-label"
-                  >Vị trí thực tập</label
-                >
-                <input
-                  type="text"
-                  id="createPosition"
-                  class="form-control"
-                  placeholder="Frontend Developer"
-                />
-              </div>
-              <div class="form-group">
-                <label for="createProgramSelect" class="form-label"
-                  >Đợt tiếp nhận</label
-                >
-                <select id="createProgramSelect" class="form-control">
-                  <option value="">-- Đang nạp danh sách đợt... --</option>
-                </select>
-              </div>
-            </div>
-
-            <div
-              style="
+          <div style="
                 background-color: #f0fdf4;
                 border: 1px solid #bbf7d0;
                 border-radius: 6px;
@@ -775,33 +597,74 @@
                 font-size: 0.82rem;
                 color: #166534;
                 margin-top: 8px;
-              "
-            >
-              ℹ️ <strong>Lưu ý:</strong> Hồ sơ sau khi tạo sẽ được kích hoạt tài
-              khoản ngay với mật khẩu mặc định: <code>Password@123</code>.
-            </div>
+              ">
+            ℹ️ <strong>Lưu ý:</strong> Hồ sơ sau khi tạo sẽ được kích hoạt tài
+            khoản ngay với mật khẩu mặc định: <code>Password@123</code>.
           </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              id="btnCancelCreateIntern"
-              class="btn-secondary-sm"
-            >
-              Hủy bỏ
-            </button>
-            <button
-              type="submit"
-              id="btnSubmitCreateIntern"
-              class="btn-primary-sm"
-              style="background-color: #059669"
-            >
-              Lưu hồ sơ
-            </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnCancelCreateIntern" class="btn-secondary-sm">
+            Hủy bỏ
+          </button>
+          <button type="submit" id="btnSubmitCreateIntern" class="btn-primary-sm" style="background-color: #059669">
+            Lưu hồ sơ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 7: Xem Danh Sách Sinh Viên Trực Thuộc Mentor (US 12) -->
+  <div id="mentorStudentsModal" class="modal-backdrop hidden">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3 id="mentorStudentsModalTitle">Danh Sách Thực Tập Sinh Hướng Dẫn</h3>
+        <button type="button" id="btnCloseMentorStudentsModal" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="mentorStudentsHeaderInfo"
+          style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="font-weight:700; color:#1e293b; font-size:1.05rem;" id="modalMentorName">...</div>
+            <div style="font-size:0.85rem; color:#64748b; margin-top:3px;" id="modalMentorDept">...</div>
           </div>
-        </form>
+          <div style="text-align:right;">
+            <span class="badge-status" id="modalMentorCapacityBadge"
+              style="background:#e0f2fe; color:#0369a1; font-weight:600;">...</span>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Mã hồ sơ</th>
+                <th>Thực tập sinh</th>
+                <th>Trường / Ngành</th>
+                <th>Vị trí</th>
+                <th>Đợt thực tập</th>
+                <th style="text-align:center;">Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody id="mentorStudentsTableBody">
+              <tr>
+                <td colspan="6" class="empty-state">Đang tải danh sách sinh viên...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between; align-items:center;">
+        <div id="modalMentorQuickAssignBtnContainer"></div>
+        <button type="button" id="btnCloseMentorStudentsModalFooter" class="btn-primary-sm">
+          Đóng
+        </button>
       </div>
     </div>
-    <!-- Script điều khiển chính -->
-    <script type="module" src="../../js/hr/hr-dashboard.js"></script>
-  </body>
+  </div>
+
+  <!-- Script điều khiển chính -->
+  <script type="module" src="../../js/hr/hr-dashboard.js"></script>
+</body>
+
 </html>

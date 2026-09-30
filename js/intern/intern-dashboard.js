@@ -90,9 +90,9 @@ function initUserHeader(user) {
 
   if (user) {
     const fullName = user.fullName || user.hoTen || "Thực tập sinh";
-    userNameHeader.textContent = fullName;
-    userEmailHeader.textContent = user.email || "";
-    welcomeUser.textContent = `Xin chào, ${fullName}!`;
+    if (userNameHeader) userNameHeader.textContent = fullName;
+    if (userEmailHeader) userEmailHeader.textContent = user.email || "";
+    if (welcomeUser) welcomeUser.textContent = `Xin chào, ${fullName}!`;
 
     // Lấy ký tự đầu làm Avatar
     const initials = fullName
@@ -101,7 +101,7 @@ function initUserHeader(user) {
       .slice(-2)
       .join("")
       .toUpperCase();
-    userAvatar.textContent = initials || "TTS";
+    if (userAvatar) userAvatar.textContent = initials || "TTS";
   }
 }
 
@@ -110,6 +110,7 @@ function initUserHeader(user) {
  */
 function initDateTime() {
   const dateEl = document.getElementById("currentDateText");
+  if (!dateEl) return;
   const now = new Date();
   const options = {
     weekday: "long",
@@ -121,14 +122,25 @@ function initDateTime() {
 }
 
 /**
- * Gọi API lấy dữ liệu tổng quan của Thực tập sinh
+ * Gọi API lấy dữ liệu tổng quan & danh sách nhiệm vụ của Thực tập sinh
  */
 async function loadDashboardData() {
   try {
-    const res = await api.get("/intern/overview");
-    if (res && res.data) {
-      renderDashboard(res.data);
+    // 1. Gọi API tổng quan
+    const resOverview = await api.get("/intern/overview");
+    let overviewData = resOverview ? resOverview.data : {};
+
+    // 2. Gọi API nhiệm vụ để lấy dữ liệu đồng bộ với trang tasks.html
+    try {
+      const resTasks = await api.get("/intern/tasks");
+      if (resTasks && resTasks.data) {
+        overviewData.pendingTasks = resTasks.data;
+      }
+    } catch (e) {
+      console.warn("Nạp nhiệm vụ chi tiết thất bại, dùng nhiệm vụ mặc định:", e);
     }
+
+    renderDashboard(overviewData);
   } catch (error) {
     console.error("Không thể nạp dữ liệu dashboard:", error);
   }
@@ -139,47 +151,71 @@ async function loadDashboardData() {
  */
 function renderDashboard(data) {
   // Cập nhật KPI
-  document.getElementById("kpiDepartment").textContent =
-    data.department || "Chưa cập nhật";
-  document.getElementById("kpiMentor").textContent =
-    data.mentorName || "Chưa phân công";
-  document.getElementById("kpiTaskCount").textContent =
-    `${data.pendingTasks.length} Task`;
+  const kpiDept = document.getElementById("kpiDepartment");
+  const kpiMentor = document.getElementById("kpiMentor");
+  const kpiTask = document.getElementById("kpiTaskCount");
+  const mentorContact = document.getElementById("mentorContactInfo");
+
+  if (kpiDept) kpiDept.textContent = data.department || "Phòng Công nghệ Phần mềm";
+  if (kpiMentor) kpiMentor.textContent = data.mentorName || "Chưa phân công";
+
+  const tasks = data.pendingTasks || [];
+  // Đếm số task chưa hoàn thành (khác 'done')
+  const activeTasks = tasks.filter((t) => t.status !== "done");
+  if (kpiTask) kpiTask.textContent = `${activeTasks.length} Task`;
 
   // Cập nhật Kênh liên hệ mentor
-  document.getElementById("mentorContactInfo").textContent =
-    `Email: ${data.mentorEmail || "Chưa có"}`;
+  if (mentorContact) {
+    mentorContact.textContent = `Email: ${data.mentorEmail || "mentor@company.com"}`;
+  }
 
   // Cập nhật trạng thái Checkin
   const checkinStatus = document.getElementById("checkinStatusText");
   const btnCheckIn = document.getElementById("btnCheckIn");
-  if (data.todayCheckedIn) {
+  if (data.todayCheckedIn && checkinStatus && btnCheckIn) {
     checkinStatus.textContent = "Đã check-in";
     checkinStatus.className = "badge-status done";
     btnCheckIn.disabled = true;
     btnCheckIn.textContent = "Đã điểm danh";
   }
 
-  // Render danh sách nhiệm vụ
+  // Render danh sách nhiệm vụ gần đây
   const taskListEl = document.getElementById("taskList");
-  if (!data.pendingTasks || data.pendingTasks.length === 0) {
+  if (!taskListEl) return;
+
+  if (tasks.length === 0) {
     taskListEl.innerHTML =
       '<div class="empty-state">Hiện tại bạn không có nhiệm vụ nào cần làm.</div>';
     return;
   }
 
-  taskListEl.innerHTML = data.pendingTasks
-    .map(
-      (task) => `
-      <div class="task-item">
-        <div>
-          <div class="task-title">${task.title}</div>
-          <div class="task-deadline">Hạn: ${task.deadline}</div>
+  const statusBadges = {
+    todo: '<span class="task-tag todo" style="background:#fee2e2; color:#dc2626;">Chưa làm</span>',
+    in_progress: '<span class="task-tag progress" style="background:#e0f2fe; color:#0369a1;">Đang làm</span>',
+    in_review: '<span class="task-tag review" style="background:#fef3c7; color:#d97706;">Chờ duyệt</span>',
+    done: '<span class="task-tag done" style="background:#dcfce7; color:#15803d;">Hoàn thành</span>',
+  };
+
+  taskListEl.innerHTML = tasks
+    .slice(0, 3) // Hiển thị tối đa 3 nhiệm vụ gần đây
+    .map((task) => {
+      const badge = statusBadges[task.status] || '<span class="task-tag progress">Đang làm</span>';
+      return `
+        <div class="task-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
+          <div>
+            <div class="task-title" style="font-weight: 600; font-size: 0.95rem;">${task.title}</div>
+            <div class="task-deadline" style="font-size: 0.8rem; color: #64748b;">Hạn: ${task.deadline}</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            ${badge}
+            <!-- NÚT CẬP NHẬT NHANH CHUYỂN TRANG TASKS.HTML -->
+            <a href="tasks.html?id=${task.id}" style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+              ✏️ Cập nhật
+            </a>
+          </div>
         </div>
-        <span class="task-tag ${task.status}">${task.status === "progress" ? "Đang làm" : "Chưa làm"}</span>
-      </div>
-    `,
-    )
+      `;
+    })
     .join("");
 }
 
@@ -188,6 +224,8 @@ function renderDashboard(data) {
  */
 async function handleCheckIn() {
   const btn = document.getElementById("btnCheckIn");
+  if (!btn) return;
+
   btn.disabled = true;
   btn.textContent = "Đang ghi nhận...";
 

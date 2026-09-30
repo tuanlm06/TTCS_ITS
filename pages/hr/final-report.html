@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cổng HR - Báo Cáo Tổng Kết Đợt Thực Tập</title>
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/auth/dashboard.css" />
+    <link rel="stylesheet" href="../../css/hr/final-report.css" />
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar bên trái dành cho HR -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>TTCS Portal</h2>
+                <span class="badge-role" style="background: #059669; color: #ffffff;">Cán bộ HR</span>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="hr-dashboard.html" class="menu-item">
+                    <span class="icon">📊</span> Quản lý Hồ sơ
+                </a>
+                <a href="#" class="menu-item">
+                    <span class="icon">🏢</span> Đợt thực tập & Phòng ban
+                </a>
+                <a href="final-report.html" class="menu-item active">
+                    <span class="icon">📈</span> Báo cáo tổng kết
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="btnLogout" class="btn-logout">
+                    <span class="icon">🚪</span> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content bên phải -->
+        <main class="main-content">
+            <!-- Topbar Header -->
+            <header class="topbar">
+                <div class="welcome-box">
+                    <h1 id="welcomeUser">Xin chào, Cán bộ HR!</h1>
+                    <p id="currentDateText">Hôm nay là ...</p>
+                </div>
+
+                <div class="user-profile-widget">
+                    <div class="user-avatar" id="userAvatar" style="background: #059669;">HR</div>
+                    <div class="user-meta">
+                        <span class="user-name" id="userNameHeader">Đang tải...</span>
+                        <span class="user-email" id="userEmailHeader">...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Nội dung chính Báo cáo Tổng kết -->
+            <div class="content-body">
+
+                <!-- Header & Thao tác xuất file -->
+                <section class="card-box-header">
+                    <div>
+                        <h2>📊 Báo Cáo Tổng Kết Đợt Thực Tập Cuối Kỳ</h2>
+                        <p class="sub-text">Tổng hợp kết quả đánh giá, điểm số và xuất báo cáo cho Ban Lãnh đạo / Nhà
+                            trường</p>
+                    </div>
+                    <div class="export-actions">
+                        <button id="btnExportCsv" class="btn-export secondary">
+                            📥 Xuất File Excel / CSV
+                        </button>
+                        <button id="btnPrintReport" class="btn-export primary">
+                            📄 In / Xuất Báo Cáo PDF
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Thẻ Khối KPI Thống Kê Nhanh -->
+                <section class="kpi-grid-4">
+                    <div class="kpi-card-item">
+                        <span class="kpi-title">Tổng Sinh Viên</span>
+                        <strong id="kpiTotalInterns" class="kpi-num">0</strong>
+                    </div>
+                    <div class="kpi-card-item">
+                        <span class="kpi-title">Điểm GPA Trung Bình</span>
+                        <strong id="kpiAvgGpa" class="kpi-num text-blue">0.0</strong>
+                    </div>
+                    <div class="kpi-card-item">
+                        <span class="kpi-title">Xếp Loại Xuất Sắc & Giỏi</span>
+                        <strong id="kpiGoodRate" class="kpi-num text-green">0</strong>
+                    </div>
+                    <div class="kpi-card-item">
+                        <span class="kpi-title">Đề Xuất Tuyển Dụng</span>
+                        <strong id="kpiRecommendHire" class="kpi-num text-orange">0</strong>
+                    </div>
+                </section>
+
+                <!-- Bảng Tổng hợp Kết quả Thực tập Chi tiết -->
+                <section class="card-box">
+                    <div class="card-header-flex">
+                        <h3>📋 Bảng Tổng Hợp Kết Quả Thực Tập Sinh</h3>
+                        <span id="reportProgramName" class="badge-program">Đợt thực tập Thu Đông 2026</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="summaryTable">
+                            <thead>
+                                <tr>
+                                    <th>Mã SV</th>
+                                    <th>Họ và Tên</th>
+                                    <th>Trường Đại học</th>
+                                    <th>Mentor Hướng Dẫn</th>
+                                    <th>Báo Cáo Đã Nộp</th>
+                                    <th>Điểm Final</th>
+                                    <th>Xếp Loại</th>
+                                    <th>Đề Xuất Tuyển Dụng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hrReportTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center">Đang tổng hợp dữ liệu báo cáo...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="../../js/hr/final-report.js"></script>
+</body>
+
+</html>

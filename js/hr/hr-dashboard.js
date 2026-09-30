@@ -115,6 +115,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
   const createProgramSelect = document.getElementById("createProgramSelect");
 
+  // Modal Xem Danh Sách Sinh Viên Trực Thuộc Mentor (US 12)
+  const mentorStudentsModal = document.getElementById("mentorStudentsModal");
+  const btnCloseMentorStudentsModal = document.getElementById(
+    "btnCloseMentorStudentsModal",
+  );
+  const btnCloseMentorStudentsModalFooter = document.getElementById(
+    "btnCloseMentorStudentsModalFooter",
+  );
+
   // 2. CHUYỂN ĐỔI TAB VIEW TRÊN SIDEBAR
   function switchView(activeMenu, activeView, title, desc) {
     document
@@ -184,7 +193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function updateKPIs() {
     const total = candidates.length;
-    const pending = candidates.filter((c) => c.status === "ChoDuyet").length;
+    const pending = candidates.filter((c) => c.status === "ChoDuyet" || c.status === "ChuaNop").length;
     const approved = candidates.filter((c) => c.status === "DaDuyet").length;
 
     const elTotal = document.getElementById("kpiTotal");
@@ -208,7 +217,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     tableBody.innerHTML = list
       .map((item) => {
         let statusBadge = "";
-        if (item.status === "ChoDuyet") {
+        if (item.status === "ChuaNop") {
+          statusBadge = `<span class="badge-status" style="background-color:#f1f5f9; color:#64748b;">Chưa nộp CV</span>`;
+        } else if (item.status === "ChoDuyet") {
           statusBadge = `<span class="badge-status pending">Chờ duyệt</span>`;
         } else if (item.status === "DaDuyet") {
           statusBadge = `<span class="badge-status done">Đã duyệt</span>`;
@@ -228,12 +239,16 @@ document.addEventListener("DOMContentLoaded", async () => {
           item.status === "DaDuyet"
             ? `
           <button class="btn-assign-mentor" data-id="${item.id}" title="Phân công Mentor" style="background-color: #059669; color: #fff; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem; font-weight:600;">
-            ${item.mentorName ? "🔄 Đổi Mentor" : "👨‍🏫 Gán Mentor"}
+            ${item.mentorName && item.mentorName !== "Chưa phân công" ? "🔄 Đổi Mentor" : "👨‍🏫 Gán Mentor"}
           </button>
         `
             : "";
 
-        const mentorDisplay = item.mentorName
+        const cvButton = item.hasCv
+          ? `<button class="btn-view-cv" data-cv="${item.cvUrl}" data-name="${item.fullName}">📄 Xem CV</button>`
+          : `<button disabled style="opacity:0.6; cursor:not-allowed; background:#e2e8f0; color:#64748b; border:none; padding:5px 9px; border-radius:4px; font-size:0.8rem;">📄 Chưa có CV</button>`;
+
+        const mentorDisplay = item.mentorName && item.mentorName !== "Chưa phân công"
           ? `<strong style="color: #059669;">${item.mentorName}</strong>`
           : `<span style="color: #94a3b8; font-style: italic;">Chưa phân công</span>`;
 
@@ -248,11 +263,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
           <td>${item.university} <br><small style="color:#64748b;">${item.major}</small></td>
           <td><strong>${item.position}</strong></td>
-          <td>
-            <button class="btn-view-cv" data-cv="${item.cvUrl}" data-name="${item.fullName}">
-              📄 Xem CV
-            </button>
-          </td>
+          <td>${cvButton}</td>
           <td>${statusBadge}</td>
           <td>${mentorDisplay}</td>
           <td style="text-align:center;">
@@ -296,6 +307,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const codeNoTone = (item.profileCode || "").toLowerCase();
       const majorNoTone = removeVietnameseTones(item.major);
       const positionNoTone = removeVietnameseTones(item.position);
+      const mentorNoTone = removeVietnameseTones(item.mentorName || "");
 
       const matchKeyword =
         !keyword ||
@@ -303,7 +315,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         emailNoTone.includes(keyword) ||
         codeNoTone.includes(keyword) ||
         majorNoTone.includes(keyword) ||
-        positionNoTone.includes(keyword);
+        positionNoTone.includes(keyword) ||
+        mentorNoTone.includes(keyword);
 
       const matchUni =
         !uni || (item.university && item.university.includes(uni));
@@ -470,7 +483,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (mentors.length === 0) {
         tableBody.innerHTML =
-          '<tr><td colspan="6" class="empty-state">Chưa có dữ liệu Mentor trong hệ thống.</td></tr>';
+          '<tr><td colspan="7" class="empty-state">Chưa có dữ liệu Mentor trong hệ thống.</td></tr>';
         return;
       }
 
@@ -479,14 +492,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           const assignedStudents = internList.filter(
             (s) => s.mentorId === m.id,
           );
+
           const studentBadges =
             assignedStudents.length > 0
               ? assignedStudents
-                  .map(
-                    (s) =>
-                      `<span style="display:inline-block; background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-size:0.8rem; margin:2px;">👤 ${s.fullName}</span>`,
-                  )
-                  .join(" ")
+                .map(
+                  (s) =>
+                    `<span style="display:inline-block; background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-size:0.8rem; margin:2px;">👤 ${s.fullName}</span>`,
+                )
+                .join(" ")
               : `<span style="color:#94a3b8; font-style:italic;">Chưa hướng dẫn sinh viên nào</span>`;
 
           const isFull = m.currentInterns >= m.maxInterns;
@@ -500,23 +514,208 @@ document.addEventListener("DOMContentLoaded", async () => {
             <td><strong>#MT-${m.id}</strong></td>
             <td>
               <div class="candidate-cell">
-                <span class="name">${m.fullName}</span>
-                <span class="email">${m.email}</span>
+                <span class="name" style="font-weight:600; color:#1e293b;">${m.fullName}</span>
+                <span class="email" style="color:#64748b; font-size:0.82rem;">${m.email}</span>
               </div>
             </td>
-            <td>${m.department} <br><small style="color:#64748b;">${m.position}</small></td>
+            <td>
+              <div>${m.department || "Khối Công nghệ"}</div>
+              <small style="color:#64748b;">${m.position || "Senior Lead"}</small>
+            </td>
             <td>
               <strong style="color: ${capacityColor}; font-size: 1rem;">${m.currentInterns} / ${m.maxInterns}</strong>
               <div style="font-size:0.75rem; color:#64748b;">sinh viên</div>
             </td>
             <td>${studentBadges}</td>
             <td style="text-align:center;">${statusBadge}</td>
+            <td style="text-align:center;">
+              <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:wrap;">
+                <button 
+                  class="btn-view-mentor-students" 
+                  data-id="${m.id}"
+                  data-name="${m.fullName}"
+                  style="background-color: #0284c7; color: #fff; border:none; padding:5px 9px; border-radius:4px; cursor:pointer; font-size:0.78rem; font-weight:600; white-space:nowrap;"
+                  title="Xem danh sách sinh viên do Mentor này phụ trách"
+                >
+                  👥 Xem SV (${assignedStudents.length})
+                </button>
+                ${!isFull
+              ? `<button 
+                        class="btn-quick-assign-mentor" 
+                        data-id="${m.id}" 
+                        data-name="${m.fullName}"
+                        style="background-color: #059669; color: #fff; border:none; padding:5px 9px; border-radius:4px; cursor:pointer; font-size:0.78rem; font-weight:600; white-space:nowrap;"
+                        title="Gán nhanh thực tập sinh cho Mentor này"
+                      >
+                        ➕ Gán TTS
+                      </button>`
+              : ""
+            }
+              </div>
+            </td>
           </tr>
         `;
         })
         .join("");
+
+      const triggerQuickAssign = async (mentorId, mentorName) => {
+        const unassigned = candidates.filter((c) => !c.mentorId);
+
+        if (unassigned.length === 0) {
+          alert("Tất cả ứng viên hiện tại đều đã được phân công Mentor!");
+          return;
+        }
+
+        const targetCandidate = unassigned[0];
+        if (!assignModal) return;
+
+        document.getElementById("assignInternId").value = targetCandidate.id;
+        document.getElementById("assignInternName").textContent =
+          targetCandidate.fullName;
+        document.getElementById("assignInternMeta").textContent =
+          `${targetCandidate.university} • Vị trí: ${targetCandidate.position}`;
+
+        if (assignProgramSelect) {
+          try {
+            const progRes = await api.get("/hr/programs");
+            const programs = progRes.data || [];
+            assignProgramSelect.innerHTML = programs
+              .map((p) => {
+                const selectedAttr =
+                  targetCandidate.programName === p.name ? "selected" : "";
+                return `<option value="${p.name}" ${selectedAttr}>${p.name} (${p.departmentName || "Khối chung"})</option>`;
+              })
+              .join("");
+          } catch (err) {
+            assignProgramSelect.innerHTML =
+              '<option value="Đợt thực tập Thu Đông 2026 (Khóa K23)">Đợt thực tập Thu Đông 2026 (Khóa K23)</option>';
+          }
+        }
+
+        if (selectMentor) {
+          try {
+            const mRes = await api.get("/hr/mentors");
+            const mList = mRes.data || [];
+            selectMentor.innerHTML =
+              '<option value="">-- Chọn Mentor phụ trách --</option>' +
+              mList
+                .map((m) => {
+                  const isMFull = m.currentInterns >= m.maxInterns;
+                  const disabledAttr = isMFull ? "disabled" : "";
+                  const countText = isMFull
+                    ? "(Đã đủ chỉ tiêu)"
+                    : `(Đang kèm: ${m.currentInterns}/${m.maxInterns})`;
+                  const selectedAttr = m.id === mentorId ? "selected" : "";
+                  return `<option value="${m.id}" ${disabledAttr} ${selectedAttr}>${m.fullName} - ${m.department} ${countText}</option>`;
+                })
+                .join("");
+          } catch (err) {
+            alert("Lỗi tải danh sách Mentor: " + err.message);
+          }
+        }
+
+        assignModal.classList.remove("hidden");
+      };
+
+      document.querySelectorAll(".btn-view-mentor-students").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const mentorId = Number(e.currentTarget.getAttribute("data-id"));
+          const mentor = mentors.find((m) => m.id === mentorId);
+          if (!mentor || !mentorStudentsModal) return;
+
+          const assignedStudents = internList.filter(
+            (s) => s.mentorId === mentor.id,
+          );
+
+          const modalNameEl = document.getElementById("modalMentorName");
+          const modalDeptEl = document.getElementById("modalMentorDept");
+          const modalCapEl = document.getElementById("modalMentorCapacityBadge");
+
+          if (modalNameEl) modalNameEl.textContent = `👨‍🏫 ${mentor.fullName}`;
+          if (modalDeptEl) modalDeptEl.textContent = `${mentor.department || "Khối Công nghệ"} • ${mentor.position || "Senior Lead"} • Email: ${mentor.email}`;
+
+          const isFull = mentor.currentInterns >= mentor.maxInterns;
+          if (modalCapEl) {
+            modalCapEl.style.background = isFull ? "#fee2e2" : "#dcfce7";
+            modalCapEl.style.color = isFull ? "#dc2626" : "#15803d";
+            modalCapEl.textContent = `Tải trọng: ${assignedStudents.length} / ${mentor.maxInterns} sinh viên (${isFull ? "Đã đầy tải" : "Còn " + (mentor.maxInterns - assignedStudents.length) + " chỗ"})`;
+          }
+
+          const tbody = document.getElementById("mentorStudentsTableBody");
+          if (tbody) {
+            if (assignedStudents.length === 0) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="6" class="empty-state" style="padding:32px; text-align:center; color:#64748b;">
+                    Mentor này hiện chưa được phân công hướng dẫn sinh viên nào.
+                  </td>
+                </tr>
+              `;
+            } else {
+              tbody.innerHTML = assignedStudents
+                .map(
+                  (s) => `
+                <tr>
+                  <td><strong>${s.profileCode || "#TTS-" + s.id}</strong></td>
+                  <td>
+                    <div class="candidate-cell">
+                      <span class="name" style="font-weight:600; color:#1e293b;">${s.fullName}</span>
+                      <span class="email" style="font-size:0.8rem; color:#64748b;">${s.email}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div>${s.university}</div>
+                    <small style="color:#64748b;">${s.major || "Chưa cập nhật"}</small>
+                  </td>
+                  <td><strong>${s.position}</strong></td>
+                  <td>${s.programName || "Đợt thực tập chung"}</td>
+                  <td style="text-align:center;">
+                    <span class="badge-status done">Đang hướng dẫn</span>
+                  </td>
+                </tr>
+              `,
+                )
+                .join("");
+            }
+          }
+
+          const quickBtnContainer = document.getElementById("modalMentorQuickAssignBtnContainer");
+          if (quickBtnContainer) {
+            if (!isFull) {
+              quickBtnContainer.innerHTML = `
+                <button 
+                  id="btnModalAssignToMentor" 
+                  class="btn-primary-sm" 
+                  style="background-color: #059669; padding: 7px 14px; font-weight:600; font-size: 0.85rem;"
+                >
+                  ➕ Phân công thêm sinh viên cho Mentor này
+                </button>
+              `;
+              document
+                .getElementById("btnModalAssignToMentor")
+                ?.addEventListener("click", () => {
+                  mentorStudentsModal.classList.add("hidden");
+                  triggerQuickAssign(mentor.id, mentor.fullName);
+                });
+            } else {
+              quickBtnContainer.innerHTML = `<span style="font-size:0.85rem; color:#dc2626; font-weight:600;">⚠️️ Mentor đã đạt tải trọng tối đa (${mentor.maxInterns} sinh viên)</span>`;
+            }
+          }
+
+          mentorStudentsModal.classList.remove("hidden");
+        });
+      });
+
+      document.querySelectorAll(".btn-quick-assign-mentor").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const mentorId = Number(e.currentTarget.getAttribute("data-id"));
+          const mentorName = e.currentTarget.getAttribute("data-name");
+          await triggerQuickAssign(mentorId, mentorName);
+        });
+      });
     } catch (err) {
-      tableBody.innerHTML = `<tr><td colspan="6" class="empty-state" style="color:#dc2626;">Lỗi tải dữ liệu Mentor: ${err.message}</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="7" class="empty-state" style="color:#dc2626;">Lỗi tải dữ liệu Mentor: ${err.message}</td></tr>`;
+      console.error("Lỗi nạp bảng Mentor:", err);
     }
   }
 
@@ -769,7 +968,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // =========================================================================
-  // 7. XỬ LÝ MODAL THÊM MỚI HỒ SƠ THỰC TẬP SINH (DUY NHẤT 1 NƠI TRONG DOM)
+  // 7. XỬ LÝ MODAL THÊM MỚI HỒ SƠ THỰC TẬP SINH
   // =========================================================================
   if (btnOpenCreateIntern && createInternModal) {
     btnOpenCreateIntern.addEventListener("click", async () => {
@@ -872,14 +1071,31 @@ document.addEventListener("DOMContentLoaded", async () => {
           major,
           position,
           programName,
-          status: "ChuaNop", // Đổi thành ChuaNop để kích hoạt luồng tự nộp CV online
+          status: "ChuaNop",
         });
 
         alert(
           "Cấp tài khoản thành công!\nMật khẩu khởi tạo: Password@123\nSinh viên hãy đăng nhập để tải tệp CV lên hệ thống.",
         );
         closeCreateInternModal();
+
+        // 1. Reset bộ lọc tìm kiếm để đảm bảo dữ liệu mới hiện ra ngay
+        if (searchInput) searchInput.value = "";
+        if (filterStatus) filterStatus.value = "";
+
+        // 2. Chuyển view về Tab Danh sách Hồ sơ nếu đang ở View khác
+        if (menuCandidates && viewCandidateList) {
+          switchView(
+            menuCandidates,
+            viewCandidateList,
+            "Danh Sách Hồ Sơ Thực Tập Sinh",
+            "Tiếp nhận, thẩm định hồ sơ ứng tuyển, ký kết hợp đồng và phân công Mentor",
+          );
+        }
+
+        // 3. Nạp lại bảng dữ liệu mới nhất từ API
         await loadCandidates();
+
         if (document.getElementById("programTableBody")) {
           await loadProgramsTable();
         }
@@ -1038,6 +1254,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnCancelProgramModal.addEventListener("click", () =>
       programModal.classList.add("hidden"),
     );
+
+  // Đóng Modal xem sinh viên trực thuộc Mentor
+  if (btnCloseMentorStudentsModal)
+    btnCloseMentorStudentsModal.addEventListener("click", () =>
+      mentorStudentsModal?.classList.add("hidden"),
+    );
+  if (btnCloseMentorStudentsModalFooter)
+    btnCloseMentorStudentsModalFooter.addEventListener("click", () =>
+      mentorStudentsModal?.classList.add("hidden"),
+    );
+  if (mentorStudentsModal) {
+    mentorStudentsModal.addEventListener("click", (e) => {
+      if (e.target === mentorStudentsModal) {
+        mentorStudentsModal.classList.add("hidden");
+      }
+    });
+  }
 
   // 12. ĐĂNG XUẤT
   const btnLogout = document.getElementById("btnLogout");

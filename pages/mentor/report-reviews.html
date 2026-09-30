@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cổng Mentor - Đánh Giá Báo Cáo Tuần</title>
+    <!-- Nhúng CSS hệ thống và CSS Dashboard -->
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/auth/dashboard.css" />
+    <link rel="stylesheet" href="../../css/mentor/report-reviews.css" />
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar bên trái dành cho Mentor -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>TTCS Portal</h2>
+                <span class="badge-role" style="background: #0284c7; color: #ffffff;">Mentor</span>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="task-management.html" class="menu-item">
+                    <span class="icon">📋</span> Quản lý & Giao việc
+                </a>
+                <a href="#" class="menu-item">
+                    <span class="icon">👥</span> Danh sách sinh viên
+                </a>
+                <a href="report-reviews.html" class="menu-item active">
+                    <span class="icon">📝</span> Đánh giá báo cáo
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="btnLogout" class="btn-logout">
+                    <span class="icon">🚪</span> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content bên phải -->
+        <main class="main-content">
+            <!-- Topbar Header -->
+            <header class="topbar">
+                <div class="welcome-box">
+                    <h1 id="welcomeUser">Xin chào, Mentor!</h1>
+                    <p id="currentDateText">Hôm nay là ...</p>
+                </div>
+
+                <div class="user-profile-widget">
+                    <div class="user-avatar" id="userAvatar" style="background: #0284c7;">MT</div>
+                    <div class="user-meta">
+                        <span class="user-name" id="userNameHeader">Đang tải...</span>
+                        <span class="user-email" id="userEmailHeader">...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Nội dung bảng điều khiển -->
+            <div class="content-body">
+                <section class="card-box-header">
+                    <div>
+                        <h2>📝 Đánh Giá & Chấm Điểm Báo Cáo Tuần</h2>
+                        <p class="sub-text">Xem chi tiết báo cáo tiến độ thực tập và gửi phản hồi hỗ trợ sinh viên</p>
+                    </div>
+                </section>
+
+                <!-- Bảng Danh sách Báo cáo -->
+                <section class="card-box">
+                    <div class="card-header-flex">
+                        <h3>📋 Danh Sách Báo Cáo Cần Đánh Giá</h3>
+                        <span id="totalReportCount" class="badge-count">0 Báo cáo</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Tuần</th>
+                                    <th>Thực tập sinh</th>
+                                    <th>Tiêu đề báo cáo</th>
+                                    <th>Thời gian nộp</th>
+                                    <th>Trạng thái</th>
+                                    <th>Điểm số</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mentorReportTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center">Đang tải danh sách báo cáo tuần...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL POPUP XEM CHI TIẾT VÀ CHẤM ĐIỂM BÁO CÁO -->
+    <div id="reviewModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalReportTitle">📝 Chi Tiết Báo Cáo Tuần</h3>
+                <button id="btnCloseModal" class="btn-close">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Thông tin tổng quan sinh viên -->
+                <div class="info-group-box">
+                    <div><strong>Thực tập sinh:</strong> <span id="modalInternName">...</span></div>
+                    <div><strong>Thời gian nộp:</strong> <span id="modalSubmittedAt">...</span></div>
+                </div>
+
+                <!-- Chi tiết nội dung báo cáo -->
+                <div class="report-detail-item">
+                    <label class="detail-label">1. Kết quả công việc đạt được trong tuần:</label>
+                    <div id="modalAchievements" class="detail-content-text">...</div>
+                </div>
+
+                <div class="report-detail-item">
+                    <label class="detail-label">2. Khó khăn / Vướng mắc gặp phải:</label>
+                    <div id="modalDifficulties" class="detail-content-text">...</div>
+                </div>
+
+                <div class="report-detail-item">
+                    <label class="detail-label">3. Kế hoạch tuần tiếp theo:</label>
+                    <div id="modalNextWeekPlan" class="detail-content-text">...</div>
+                </div>
+
+                <div class="report-detail-item">
+                    <label class="detail-label">4. Minh chứng / Sản phẩm đính kèm:</label>
+                    <div id="modalAttachment">
+                        <a href="#" id="modalAttachmentLink" target="_blank" class="attachment-link">🔗 Xem file / Link
+                            đính kèm</a>
+                    </div>
+                </div>
+
+                <hr class="divider" />
+
+                <!-- Form Chấm điểm & Nhận xét -->
+                <form id="reviewForm">
+                    <input type="hidden" id="modalReportId" />
+
+                    <div class="form-group">
+                        <label class="form-label">Điểm đánh giá (Thang điểm 10) <span class="required">*</span></label>
+                        <input type="number" id="scoreInput" class="form-control" min="0" max="10" step="0.5"
+                            placeholder="Nhập điểm số (Ví dụ: 8.5)" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nhận xét & Góp ý chuyên môn từ Mentor <span
+                                class="required">*</span></label>
+                        <textarea id="feedbackInput" rows="3" class="form-control"
+                            placeholder="Nhập lời nhận xét, đánh giá thái độ và góp ý hướng phát triển..."
+                            required></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" id="btnCancelModal" class="btn-secondary">Hủy bỏ</button>
+                        <button type="submit" id="btnSubmitReview" class="btn-primary">💾 GỬI ĐÁNH GIÁ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script điều khiển ES Modules -->
+    <script type="module" src="../../js/mentor/report-reviews.js"></script>
+</body>
+
+</html>
